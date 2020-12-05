@@ -1,5 +1,6 @@
 package com.taulia.devtask1.transformer;
 
+import com.taulia.devtask1.transformer.helper.TransformerContext;
 import com.taulia.devtask1.transformer.strategy.Strategy;
 import com.taulia.devtask1.transformer.strategy.StrategySelector;
 import lombok.RequiredArgsConstructor;
@@ -9,17 +10,19 @@ import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
-public class TransformerImpl {
+public class CompositeTransformer implements Transformer {
 
     private final StrategySelector strategySelector;
-    private final DiskTransformer diskTransformer;
-    private final InMemoryTransformer inMemoryTransformer;
+    private final Transformer diskTransformer;
+    private final Transformer inMemoryTransformer;
 
-    public void transform(TransformerContext initialContext) {
+    @Override
+    public TransformerContext transform(TransformerContext initialContext) throws Exception {
         doTransform(initialContext);
+        return null;
     }
 
-    private void doTransform(TransformerContext initialContext) {
+    private void doTransform(TransformerContext initialContext) throws Exception {
         final List<TransformerContext> pendingList = new ArrayList<>(List.of(initialContext));
         while (! pendingList.isEmpty()) {
             TransformerContext currentContext = pendingList.remove(0);
@@ -28,8 +31,7 @@ public class TransformerImpl {
             TransformerContext nextContext = null;
             switch (strategy) {
                 case IN_MEMORY: {
-                    inMemoryTransformer.transform(currentContext);
-                    nextContext = null;
+                    nextContext = inMemoryTransformer.transform(currentContext);
                     break;
                 }
                 case ON_DISK: {
@@ -45,14 +47,5 @@ public class TransformerImpl {
                 pendingList.add(nextContext);
             }
         }
-    }
-
-    private TransformerContext transformInMemory(TransformerContext context) {
-        inMemoryTransformer.transform(context);
-        return null;
-    }
-
-    private TransformerContext transformOnDisk(TransformerContext context) {
-        return diskTransformer.transform(context);
     }
 }

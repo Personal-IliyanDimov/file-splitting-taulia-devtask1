@@ -1,4 +1,4 @@
-package com.taulia.devtask1.transformer;
+package com.taulia.devtask1.transformer.helper;
 
 import lombok.Getter;
 import lombok.Setter;

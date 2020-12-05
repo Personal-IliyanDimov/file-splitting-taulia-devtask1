@@ -1,7 +1,7 @@
 package com.taulia.devtask1.transformer.strategy;
 
-import com.taulia.devtask1.transformer.TransformerConfig;
-import com.taulia.devtask1.transformer.TransformerContext;
+import com.taulia.devtask1.transformer.helper.TransformerConfig;
+import com.taulia.devtask1.transformer.helper.TransformerContext;
 
 import java.io.File;
 
