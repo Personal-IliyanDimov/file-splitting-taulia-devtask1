@@ -54,13 +54,15 @@ public class DiskConsumer implements TransformerConsumer {
         }
         buyerToFileContext.clear();
 
-        try {
-            otherFileContext.getOrCreateOutputWriter().close();
-        } catch (Exception exc) {
-            log.error("Unable to close file. ", exc);
-            list.add(exc);
+        if (otherFileContext != null) {
+            try {
+                otherFileContext.getOrCreateOutputWriter().close();
+            } catch (Exception exc) {
+                log.error("Unable to close file. ", exc);
+                list.add(exc);
+            }
+            otherFileContext = null;
         }
-        otherFileContext = null;
 
         if (! list.isEmpty()) {
             throw new IOException("Multiple io exceptions occurred during clean up: " + list.toString());

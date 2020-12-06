@@ -49,8 +49,6 @@ public class CommandRunner {
 		command.executeCommand(inputFile, outputFolder, outputType);
 	}
 
-
-
 	public static class TransformCommand {
 
 		private CompositeTransformer compositeTransformer;
@@ -80,7 +78,7 @@ public class CommandRunner {
 
 		private TransformerConfig prepareTransformerConfig() {
 			TransformerConfig config = new TransformerConfig();
-			config.setMaxOpenHandlers(4);
+			config.setMaxOpenHandlers(2);
 			config.setMaxInMemoryFileSizeInBytes(512*1024);
 			return config;
 		}

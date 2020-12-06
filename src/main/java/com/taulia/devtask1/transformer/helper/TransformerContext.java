@@ -89,23 +89,22 @@ public class TransformerContext {
         private OutputWriter<InvoiceRecord> outputWriter;
 
         public OutputWriter<InvoiceRecord> getOrCreateOutputWriter() throws IOException {
-            OutputWriter<InvoiceRecord> outputWriter = getOutputWriter();
-            if (Objects.isNull(outputWriter)) {
+            if (Objects.isNull(this.outputWriter)) {
                 switch (outputType) {
                     case CSV:
-                        outputFile = new File(outputFolder, outputPrefix + "-" + outputIndex + ".csv");
+                        this.outputFile = new File(outputFolder, outputPrefix + "-" + outputIndex + ".csv");
                         final CsvWriter csvWriter = new CsvWriter(outputFile, new InvoiceRecordToCsvRowConverter());
-                        outputWriter = csvWriter;
+                        this.outputWriter = csvWriter;
                         break;
 
                     case XML:
-                        outputFile = new File(outputFolder, outputPrefix + "-" + outputIndex + ".xml");
+                        this.outputFile = new File(outputFolder, outputPrefix + "-" + outputIndex + ".xml");
                         final XmlWriter xmlWriter = new XmlWriter(outputFile, new InvoiceRecordToXmlElementConverter());
-                        outputWriter = xmlWriter;
+                        this.outputWriter = xmlWriter;
                         break;
                 }
             }
-            return outputWriter;
+            return this.outputWriter;
         }
     }
 }
