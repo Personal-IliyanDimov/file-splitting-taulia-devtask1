@@ -31,7 +31,7 @@ public class CsvWriter implements OutputWriter<InvoiceRecord> {
     }
 
     @Override
-    public void process(InvoiceRecord input) throws IOException {
+    public void process(InvoiceRecord input, ImageContext imageContext) throws IOException {
         writer.write(converter.convert(input) + System.lineSeparator());
     }
 

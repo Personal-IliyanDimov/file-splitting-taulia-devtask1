@@ -20,8 +20,13 @@ public abstract class AbstractTransformer implements Transformer {
 
         final File inputFile = context.getInputFile();
         final InputReader<InvoiceRecord> inputReader = findReader(inputFile);
-        inputReader.process(transformerConsumer.getRecordsConsumer());
-        transformerConsumer.process();
+        try {
+            inputReader.process(transformerConsumer.getRecordsConsumer());
+            transformerConsumer.process();
+        } finally {
+            transformerConsumer.finish();
+        }
+
 
         return getNextContext();
     }
@@ -44,5 +49,5 @@ public abstract class AbstractTransformer implements Transformer {
 
     protected abstract TransformerConsumer getConsumer(TransformerContext context);
 
-    protected abstract TransformerContext getNextContext();
+    protected abstract TransformerContext getNextContext() throws IOException;
 }

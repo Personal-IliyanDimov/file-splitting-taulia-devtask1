@@ -5,6 +5,7 @@ import com.taulia.devtask1.io.data.InvoiceRecord;
 import com.taulia.devtask1.transformer.consumer.TransformerConsumer;
 import com.taulia.devtask1.transformer.helper.TransformerContext;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +39,11 @@ public class InMemoryConsumer implements TransformerConsumer {
         doProcess();
     }
 
+    @Override
+    public void finish() throws Exception {
+        buyerToInvoiceListMap.clear();
+    }
+
     private void doProcess() throws Exception {
         for (Map.Entry<String, List<InvoiceRecord>> entry : buyerToInvoiceListMap.entrySet()) {
             final TransformerContext.FileContext fileContext = context.nextBuyerContext();
@@ -48,14 +54,25 @@ public class InMemoryConsumer implements TransformerConsumer {
 
                 final List<InvoiceRecord> recordList = entry.getValue();
                 for (InvoiceRecord record : recordList) {
-                    outputWriter.process(record);
+                    outputWriter.process(record, prepareImageContext());
                 }
 
                 outputWriter.end();
             }
             finally {
-                outputWriter.close();
+                if (outputWriter != null) {
+                    outputWriter.close();
+                }
             }
         }
+    }
+
+    private OutputWriter.ImageContext prepareImageContext() {
+        return new OutputWriter.ImageContext() {
+            @Override
+            public File generateFileName() {
+                return context.nextImageFile();
+            }
+        };
     }
 }

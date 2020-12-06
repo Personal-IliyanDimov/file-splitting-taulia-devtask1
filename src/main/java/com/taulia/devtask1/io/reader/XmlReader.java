@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -83,11 +82,7 @@ public class XmlReader implements InputReader {
         }
         finally {
             if (reader != null) {
-                try {
-                    reader.close();
-                } catch (XMLStreamException e) {
-                    log.error("Unable to close reader. ", e);
-                }
+                reader.close();
             }
         }
     }

@@ -6,11 +6,12 @@ import com.taulia.devtask1.io.reader.converter.InvoiceRecordToXmlElementConverte
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,8 +37,16 @@ public class XmlWriter implements OutputWriter<InvoiceRecord> {
     }
 
     @Override
-    public void process(InvoiceRecord input) throws IOException {
-        writer.write(converter.convert(input) + System.lineSeparator());
+    public void process(InvoiceRecord input, ImageContext imageContext) throws IOException {
+        File imageFile = null;
+        if ((input.getInvoiceImage() != null) && (! input.getInvoiceImage().isBlank())) {
+            imageFile = imageContext.generateFileName();
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(imageFile))) {
+                bw.write(input.getInvoiceImage());
+            }
+        }
+
+        writer.write(converter.convert(input, imageFile.toString()) + System.lineSeparator());
     }
 
     @Override
@@ -47,7 +56,7 @@ public class XmlWriter implements OutputWriter<InvoiceRecord> {
 
     @Override
     public void close() throws IOException {
-        if (Objects.isNull(writer)) {
+        if (writer == null) {
             return ;
         }
         writer.close();

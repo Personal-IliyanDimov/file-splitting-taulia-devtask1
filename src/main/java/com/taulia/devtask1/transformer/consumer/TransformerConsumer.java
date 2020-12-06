@@ -7,4 +7,5 @@ import java.util.function.Consumer;
 public interface TransformerConsumer {
     public Consumer<InvoiceRecord> getRecordsConsumer();
     public void process() throws Exception;
+    public void finish() throws Exception;
 }

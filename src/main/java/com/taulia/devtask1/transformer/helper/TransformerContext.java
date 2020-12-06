@@ -24,8 +24,13 @@ public class TransformerContext {
     private Long outputBuyerIndex;
     private String outputOtherPrefix;
     private Long outputOtherIndex;
-    private TransformerConfig config;
+    private String imagePrefix;
+    private Long imageIndex;
 
+    private File nextInputFile;
+    private File oldNextInputFile;
+
+    private TransformerConfig config;
 
     public FileContext nextBuyerContext() {
         final FileContext fileContext = new FileContext();
@@ -36,6 +41,36 @@ public class TransformerContext {
         return fileContext;
     }
 
+    public FileContext nextOtherContext() {
+        final FileContext fileContext = new FileContext();
+        fileContext.setOutputFolder(outputFolder);
+        fileContext.setOutputType(outputType);
+        fileContext.setOutputPrefix(outputOtherPrefix);
+        fileContext.setOutputIndex(outputOtherIndex ++);
+        return fileContext;
+    }
+
+    public File nextImageFile() {
+        final Long currentImageIndex = imageIndex ++;
+        return new File(outputFolder, imagePrefix + "-" + currentImageIndex + ".img");
+
+    }
+
+    public TransformerContext copy() {
+        final TransformerContext other = new TransformerContext();
+        other.inputFile = this.inputFile;
+        other.outputFolder = this.outputFolder;
+        other.outputType = this.outputType;
+        other.outputBuyerPrefix = this.outputBuyerPrefix;
+        other.outputBuyerIndex = this.outputBuyerIndex;
+        other.outputOtherPrefix = this.outputOtherPrefix;
+        other.outputOtherIndex = this.outputOtherIndex;
+        other.imagePrefix = this.imagePrefix;
+        other.imageIndex = this.imageIndex;
+        other.nextInputFile = this.nextInputFile;
+        other.oldNextInputFile = this.oldNextInputFile;
+        return other;
+    }
 
     public static enum OutputType {
         CSV,
@@ -50,6 +85,7 @@ public class TransformerContext {
         private String outputPrefix;
         private Long outputIndex;
         private OutputType outputType;
+        private File outputFile;
         private OutputWriter<InvoiceRecord> outputWriter;
 
         public OutputWriter<InvoiceRecord> getOrCreateOutputWriter() throws IOException {
@@ -57,14 +93,14 @@ public class TransformerContext {
             if (Objects.isNull(outputWriter)) {
                 switch (outputType) {
                     case CSV:
-                        final File outputCsvFile = new File(outputFolder, outputPrefix + "-" + outputIndex + ".csv");
-                        final CsvWriter csvWriter = new CsvWriter(outputCsvFile, new InvoiceRecordToCsvRowConverter());
+                        outputFile = new File(outputFolder, outputPrefix + "-" + outputIndex + ".csv");
+                        final CsvWriter csvWriter = new CsvWriter(outputFile, new InvoiceRecordToCsvRowConverter());
                         outputWriter = csvWriter;
                         break;
 
                     case XML:
-                        final File outputXmlFile = new File(outputFolder, outputPrefix + "-" + outputIndex + ".xml");
-                        final XmlWriter xmlWriter = new XmlWriter(outputXmlFile, new InvoiceRecordToXmlElementConverter());
+                        outputFile = new File(outputFolder, outputPrefix + "-" + outputIndex + ".xml");
+                        final XmlWriter xmlWriter = new XmlWriter(outputFile, new InvoiceRecordToXmlElementConverter());
                         outputWriter = xmlWriter;
                         break;
                 }
