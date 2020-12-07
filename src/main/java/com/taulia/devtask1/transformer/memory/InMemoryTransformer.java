@@ -10,9 +10,4 @@ public class InMemoryTransformer extends AbstractTransformer {
     protected TransformerConsumer getConsumer(TransformerContext context) {
         return new InMemoryConsumer(context);
     }
-
-    @Override
-    protected TransformerContext getNextContext() {
-        return null;
-    }
 }

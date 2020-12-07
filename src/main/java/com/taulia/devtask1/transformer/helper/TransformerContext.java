@@ -6,31 +6,45 @@ import com.taulia.devtask1.io.reader.converter.InvoiceRecordToCsvRowConverter;
 import com.taulia.devtask1.io.reader.converter.InvoiceRecordToXmlElementConverter;
 import com.taulia.devtask1.io.writer.CsvWriter;
 import com.taulia.devtask1.io.writer.XmlWriter;
+import com.taulia.devtask1.transformer.splitter.Split;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Objects;
 
 @Getter
 @Setter
 public class TransformerContext {
-    private File inputFile;
+    private Split currentSplit;
+    private ArrayList<Split> splitArray;
     private File outputFolder;
     private OutputType outputType;
+    private String outputSplitPrefix;
+    private long outputSplitIndex;
     private String outputBuyerPrefix;
-    private Long outputBuyerIndex;
+    private long outputBuyerIndex;
     private String outputOtherPrefix;
-    private Long outputOtherIndex;
+    private long outputOtherIndex;
     private String imagePrefix;
-    private Long imageIndex;
+    private long imageIndex;
 
     private File nextInputFile;
     private File oldNextInputFile;
 
     private TransformerConfig config;
+
+    public FileContext nextSplitContext() {
+        final FileContext fileContext = new FileContext();
+        fileContext.setOutputFolder(outputFolder);
+        fileContext.setOutputType(outputType);
+        fileContext.setOutputPrefix(outputSplitPrefix);
+        fileContext.setOutputIndex(outputSplitIndex ++);
+        return fileContext;
+    }
 
     public FileContext nextBuyerContext() {
         final FileContext fileContext = new FileContext();
@@ -51,14 +65,15 @@ public class TransformerContext {
     }
 
     public File nextImageFile() {
-        final Long currentImageIndex = imageIndex ++;
+        final long currentImageIndex = imageIndex ++;
         return new File(outputFolder, imagePrefix + "-" + currentImageIndex + ".img");
 
     }
 
     public TransformerContext copy() {
         final TransformerContext other = new TransformerContext();
-        other.inputFile = this.inputFile;
+        other.currentSplit = this.currentSplit;
+        other.splitArray = this.splitArray;
         other.outputFolder = this.outputFolder;
         other.outputType = this.outputType;
         other.outputBuyerPrefix = this.outputBuyerPrefix;
@@ -83,7 +98,7 @@ public class TransformerContext {
     public static class FileContext {
         private File outputFolder;
         private String outputPrefix;
-        private Long outputIndex;
+        private long outputIndex;
         private OutputType outputType;
         private File outputFile;
         private OutputWriter<InvoiceRecord> outputWriter;

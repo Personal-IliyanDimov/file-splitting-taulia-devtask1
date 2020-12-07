@@ -1,41 +1,44 @@
 package com.taulia.devtask1.transformer;
 
 import com.taulia.devtask1.transformer.helper.TransformerContext;
+import com.taulia.devtask1.transformer.splitter.Split;
 import com.taulia.devtask1.transformer.strategy.Strategy;
 import com.taulia.devtask1.transformer.strategy.StrategySelector;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 public class CompositeTransformer implements Transformer {
 
     private final StrategySelector strategySelector;
+    private final Transformer splittingTransformer;
     private final Transformer diskTransformer;
     private final Transformer inMemoryTransformer;
 
     @Override
-    public TransformerContext transform(TransformerContext initialContext) throws Exception {
+    public Split[] transform(TransformerContext initialContext) throws Exception {
         doTransform(initialContext);
-        return null;
+        return new Split[0];
     }
 
-    private void doTransform(TransformerContext initialContext) throws Exception {
-        final List<TransformerContext> pendingList = new ArrayList<>(List.of(initialContext));
-        while (! pendingList.isEmpty()) {
-            TransformerContext currentContext = pendingList.remove(0);
-            final Strategy strategy = strategySelector.transform(currentContext);
+    private void doTransform(TransformerContext context) throws Exception {
+        while (context.getCurrentSplit() != null) {
+            final Strategy strategy = context.getCurrentSplit().getStrategy();
 
-            TransformerContext nextContext = null;
+            Split[] splitArray = null;
             switch (strategy) {
+                case SPLIT: {
+                    splitArray = splittingTransformer.transform(context);
+                    break;
+                }
                 case IN_MEMORY: {
-                    nextContext = inMemoryTransformer.transform(currentContext);
+                    splitArray = inMemoryTransformer.transform(context);
                     break;
                 }
                 case ON_DISK: {
-                    nextContext = diskTransformer.transform(currentContext);
+                    splitArray = diskTransformer.transform(context);
                     break;
                 }
                 default: {
@@ -43,9 +46,11 @@ public class CompositeTransformer implements Transformer {
                 }
             }
 
-            if (Objects.nonNull(nextContext)) {
-                pendingList.add(nextContext);
-            }
+            advanceContext(context, Arrays.asList(splitArray));
         }
+    }
+
+    private void advanceContext(TransformerContext context, List<Split> additionalSplits) {
+
     }
 }

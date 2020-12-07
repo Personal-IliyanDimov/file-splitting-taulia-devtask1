@@ -4,6 +4,7 @@ import com.taulia.devtask1.io.OutputWriter;
 import com.taulia.devtask1.io.data.InvoiceRecord;
 import com.taulia.devtask1.transformer.consumer.TransformerConsumer;
 import com.taulia.devtask1.transformer.helper.TransformerContext;
+import com.taulia.devtask1.transformer.splitter.Split;
 
 import java.io.File;
 import java.util.HashMap;
@@ -35,8 +36,9 @@ public class InMemoryConsumer implements TransformerConsumer {
     }
 
     @Override
-    public void process() throws Exception {
+    public Split[] process() throws Exception {
         doProcess();
+        return new Split[0];
     }
 
     @Override

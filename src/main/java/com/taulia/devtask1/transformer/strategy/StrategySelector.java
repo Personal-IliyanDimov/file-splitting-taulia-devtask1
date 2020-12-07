@@ -1,36 +1,33 @@
 package com.taulia.devtask1.transformer.strategy;
 
 import com.taulia.devtask1.transformer.helper.TransformerConfig;
-import com.taulia.devtask1.transformer.helper.TransformerContext;
+import com.taulia.devtask1.transformer.splitter.Split;
 
 import java.io.File;
 
 public class StrategySelector {
-    public Strategy transform(TransformerContext context) {
-        final TransformerConfig config = context.getConfig();
-        final File inputFile = context.getInputFile();
-        final File outputFolder = context.getOutputFolder();
 
-        if (! inputFile.isFile()) {
-            throw new IllegalArgumentException("Input file must be a file: " + inputFile.toPath().toString());
-        }
-        if (!inputFile.exists()) {
-            throw new IllegalArgumentException("Input file does not exist: " + inputFile.toPath().toString());
-        }
-
-        if (! outputFolder.isDirectory()) {
-            throw new IllegalArgumentException("Output file must be a folder: " + outputFolder.toPath().toString());
-        }
-
-        if (! outputFolder.exists()) {
-            throw new IllegalArgumentException("Output folder does not exist: " + outputFolder.toPath().toString());
-        }
-
+    public Strategy select(File inputFile, TransformerConfig transformerConfig) {
         Strategy strategy = null;
-        if (inputFile.length() <  config.getMaxInMemoryFileSizeInBytes()) {
+        if (inputFile.length() <  transformerConfig.getMaxInMemoryFileSizeInBytes()) {
             strategy = Strategy.IN_MEMORY;
         } else {
-            strategy = Strategy.ON_DISK;
+            strategy = Strategy.SPLIT;
+        }
+
+        return strategy;
+    }
+
+    public Strategy select(File inputFile, Split parentSplit, TransformerConfig transformerConfig) {
+        Strategy strategy = null;
+        if (inputFile.length() <  transformerConfig.getMaxInMemoryFileSizeInBytes()) {
+            strategy = Strategy.IN_MEMORY;
+        } else {
+            if (Strategy.SPLIT.equals(parentSplit.getStrategy()) && parentSplit.getSplitDetails().getSplitFactor() > 2) {
+                strategy = Strategy.SPLIT;
+            }  else {
+                strategy = Strategy.ON_DISK;
+            }
         }
 
         return strategy;

@@ -4,6 +4,9 @@ import com.taulia.devtask1.io.OutputWriter;
 import com.taulia.devtask1.io.data.InvoiceRecord;
 import com.taulia.devtask1.transformer.consumer.TransformerConsumer;
 import com.taulia.devtask1.transformer.helper.TransformerContext;
+import com.taulia.devtask1.transformer.splitter.Split;
+import com.taulia.devtask1.transformer.strategy.Strategy;
+import com.taulia.devtask1.transformer.strategy.StrategySelector;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -17,13 +20,15 @@ import java.util.function.Consumer;
 @Slf4j
 public class DiskConsumer implements TransformerConsumer {
     private final TransformerContext context;
+    private final StrategySelector strategySelector;
 
     private Map<String, TransformerContext.FileContext> buyerToFileContext;
     private TransformerContext.FileContext otherFileContext;
 
     public DiskConsumer(TransformerContext context) {
         this.context = context;
-        buyerToFileContext = new HashMap<>();
+        this.strategySelector = new StrategySelector();
+        this.buyerToFileContext = new HashMap<>();
     }
 
     @Override
@@ -32,7 +37,9 @@ public class DiskConsumer implements TransformerConsumer {
     }
 
     @Override
-    public void process() throws IOException {
+    public Split[] process() throws IOException {
+        final Split split = doProcess();
+        return split != null ? new Split[] { split } : new Split[0];
     }
 
     @Override
@@ -122,19 +129,23 @@ public class DiskConsumer implements TransformerConsumer {
         };
     }
 
-    public TransformerContext prepareNextContext() throws IOException {
-        final TransformerContext nextContext = context.copy();
-        nextContext.setInputFile(context.getNextInputFile());
-
-        final File oldNextInputFile = nextContext.getOldNextInputFile();
-        if (oldNextInputFile != null) {
-            final boolean oldNexInputFileIsDeleted = oldNextInputFile.delete();
-            if (! oldNexInputFileIsDeleted) {
-                throw new IllegalStateException("Unable to delete old next input file: " + oldNextInputFile);
-            }
-            nextContext.setOldNextInputFile(null);
+    public Split doProcess() throws IOException {
+        if (otherFileContext == null) {
+            return null;
         }
 
-        return nextContext;
+        final File outputFile = otherFileContext.getOutputFile();
+        final Strategy strategy = strategySelector.select(outputFile, context.getCurrentSplit(), context.getConfig());
+
+        final Split otherSplit = new Split();
+        otherSplit.setInputFile(outputFile);
+        otherSplit.setDeleteInput(true);
+        otherSplit.setStrategy(strategy);
+
+        if (Strategy.SPLIT.equals(otherSplit.getStrategy())) {
+            throw new IllegalStateException("Unexpected strategy is provided: " + strategy);
+        }
+
+        return otherSplit;
     }
 }

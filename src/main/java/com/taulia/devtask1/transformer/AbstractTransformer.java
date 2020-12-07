@@ -7,6 +7,7 @@ import com.taulia.devtask1.io.reader.XmlReader;
 import com.taulia.devtask1.io.reader.converter.CsvRowToInvoiceRecordConverter;
 import com.taulia.devtask1.transformer.consumer.TransformerConsumer;
 import com.taulia.devtask1.transformer.helper.TransformerContext;
+import com.taulia.devtask1.transformer.splitter.Split;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,20 +16,17 @@ import java.util.Locale;
 public abstract class AbstractTransformer implements Transformer {
 
     @Override
-    public TransformerContext transform(TransformerContext context) throws Exception {
+    public Split[] transform(TransformerContext context) throws Exception {
         final TransformerConsumer transformerConsumer = getConsumer(context);
 
-        final File inputFile = context.getInputFile();
+        final File inputFile = context.getCurrentSplit().getInputFile();
         final InputReader<InvoiceRecord> inputReader = findReader(inputFile);
         try {
             inputReader.process(transformerConsumer.getRecordsConsumer());
-            transformerConsumer.process();
+            return transformerConsumer.process();
         } finally {
             transformerConsumer.finish();
         }
-
-
-        return getNextContext();
     }
 
     private InputReader<InvoiceRecord> findReader(File inputFile) throws IOException {
@@ -49,5 +47,4 @@ public abstract class AbstractTransformer implements Transformer {
 
     protected abstract TransformerConsumer getConsumer(TransformerContext context);
 
-    protected abstract TransformerContext getNextContext() throws IOException;
 }
