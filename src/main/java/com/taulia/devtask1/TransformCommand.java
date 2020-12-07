@@ -10,7 +10,6 @@ import com.taulia.devtask1.transformer.memory.InMemoryTransformer;
 import com.taulia.devtask1.transformer.splitter.Split;
 import com.taulia.devtask1.transformer.splitter.SplitHelper;
 import com.taulia.devtask1.transformer.splitter.SplittingTransformer;
-import com.taulia.devtask1.transformer.strategy.StrategySelector;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,17 +17,16 @@ import java.util.List;
 
 public class TransformCommand {
 
-    private SplitHelper splitHelper;
+    private SplitHelper helper;
     private CompositeTransformer compositeTransformer;
 
     public TransformCommand() {
-        final SplitHelper helper = new SplitHelper();
+        helper = new SplitHelper();
 
-        final StrategySelector strategySelector = new StrategySelector();
         final Transformer splittingTransformer = new SplittingTransformer();
         final Transformer diskTransformer = new DiskTransformer();
         final Transformer inMemoryTransformer = new InMemoryTransformer();
-        compositeTransformer = new CompositeTransformer(strategySelector, splittingTransformer, diskTransformer, inMemoryTransformer);
+        compositeTransformer = new CompositeTransformer(splittingTransformer, diskTransformer, inMemoryTransformer);
     }
 
     public void executeCommand(File inputFile, File outputFolder, TransformerContext.OutputType outputType) {
@@ -72,8 +70,7 @@ public class TransformCommand {
     }
 
     private Split prepareInitialSplit(File inputFile, TransformerConfig config) {
-        final Split initialSplit = splitHelper.buildRootSplit(inputFile, config);
-        return initialSplit;
+        return helper.buildRootSplit(inputFile, config);
     }
 
     private static class DeepFirstTraversePolicy implements TransformerConfig.TraversePolicy {

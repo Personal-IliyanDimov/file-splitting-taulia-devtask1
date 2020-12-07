@@ -100,8 +100,6 @@ public class DiskConsumer implements TransformerConsumer {
                       final TransformerContext.FileContext otherFileContext = context.nextOtherContext();
                       try {
                           otherFileContext.getOrCreateOutputWriter().init();
-                          context.setOldNextInputFile(context.getNextInputFile());
-                          context.setNextInputFile(otherFileContext.getOutputFile());
                       } catch (IOException ioe) {
                           throw new RuntimeException("Unable to create output writer: " + otherFileContext, ioe);
                       }

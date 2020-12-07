@@ -44,6 +44,7 @@ public class XmlWriter implements OutputWriter<InvoiceRecord> {
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(imageFile))) {
                 bw.write(input.getInvoiceImage());
             }
+            input.setInvoiceImage(null);
         }
 
         writer.write(converter.convert(input, imageFile.toString()) + System.lineSeparator());

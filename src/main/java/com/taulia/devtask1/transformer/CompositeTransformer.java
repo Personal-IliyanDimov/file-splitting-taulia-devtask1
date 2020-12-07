@@ -3,7 +3,6 @@ package com.taulia.devtask1.transformer;
 import com.taulia.devtask1.transformer.helper.TransformerContext;
 import com.taulia.devtask1.transformer.splitter.Split;
 import com.taulia.devtask1.transformer.strategy.Strategy;
-import com.taulia.devtask1.transformer.strategy.StrategySelector;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -13,7 +12,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CompositeTransformer implements Transformer {
 
-    private final StrategySelector strategySelector;
     private final Transformer splittingTransformer;
     private final Transformer diskTransformer;
     private final Transformer inMemoryTransformer;
