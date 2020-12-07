@@ -6,6 +6,7 @@ import com.taulia.devtask1.transformer.strategy.Strategy;
 import com.taulia.devtask1.transformer.strategy.StrategySelector;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,7 +51,8 @@ public class CompositeTransformer implements Transformer {
         }
     }
 
-    private void advanceContext(TransformerContext context, List<Split> additionalSplits) {
-
+    private void advanceContext(TransformerContext context, List<Split> additionalSplits) throws IOException {
+        context.addSplits(additionalSplits);
+        context.rotateCurrentSplit();
     }
 }

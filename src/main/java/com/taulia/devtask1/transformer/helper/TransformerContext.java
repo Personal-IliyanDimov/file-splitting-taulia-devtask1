@@ -14,13 +14,14 @@ import lombok.ToString;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
 @Setter
 public class TransformerContext {
     private Split currentSplit;
-    private ArrayList<Split> splitArray;
+    private ArrayList<Split> splitList;
     private File outputFolder;
     private OutputType outputType;
     private String outputSplitPrefix;
@@ -31,9 +32,6 @@ public class TransformerContext {
     private long outputOtherIndex;
     private String imagePrefix;
     private long imageIndex;
-
-    private File nextInputFile;
-    private File oldNextInputFile;
 
     private TransformerConfig config;
 
@@ -70,21 +68,21 @@ public class TransformerContext {
 
     }
 
-    public TransformerContext copy() {
-        final TransformerContext other = new TransformerContext();
-        other.currentSplit = this.currentSplit;
-        other.splitArray = this.splitArray;
-        other.outputFolder = this.outputFolder;
-        other.outputType = this.outputType;
-        other.outputBuyerPrefix = this.outputBuyerPrefix;
-        other.outputBuyerIndex = this.outputBuyerIndex;
-        other.outputOtherPrefix = this.outputOtherPrefix;
-        other.outputOtherIndex = this.outputOtherIndex;
-        other.imagePrefix = this.imagePrefix;
-        other.imageIndex = this.imageIndex;
-        other.nextInputFile = this.nextInputFile;
-        other.oldNextInputFile = this.oldNextInputFile;
-        return other;
+    public void addSplits(List<Split> splits) {
+        config.getTraverPolicy().addSplits(this, splits);
+    }
+
+    public void rotateCurrentSplit() throws IOException {
+        if (this.currentSplit.isDeleteInput()) {
+            final boolean success = currentSplit.getInputFile().delete();
+            if (! success) {
+                throw new RuntimeException("Unable to delete current split file: " +  currentSplit.getInputFile().toString());
+            }
+        }
+        this.splitList.remove(currentSplit);
+
+        final Split nextSplit = config.getTraverPolicy().nextSplit(this);
+        this.currentSplit = nextSplit;
     }
 
     public static enum OutputType {

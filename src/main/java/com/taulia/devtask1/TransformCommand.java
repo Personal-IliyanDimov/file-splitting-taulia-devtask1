@@ -14,6 +14,7 @@ import com.taulia.devtask1.transformer.strategy.StrategySelector;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TransformCommand {
 
@@ -50,13 +51,14 @@ public class TransformCommand {
         TransformerConfig config = new TransformerConfig();
         config.setMaxOpenHandlers(2);
         config.setMaxInMemoryFileSizeInBytes(512*1024);
+        config.setTraverPolicy(new DeepFirstTraversePolicy());
         return config;
     }
 
     private TransformerContext getTransformerContext(File inputFile, File outputFolder, TransformerContext.OutputType outputType, TransformerConfig config) {
         final TransformerContext context = new TransformerContext();
         context.setCurrentSplit(prepareInitialSplit(inputFile, config));
-        context.setSplitArray(new ArrayList<>());
+        context.setSplitList(new ArrayList<>());
         context.setOutputFolder(outputFolder);
         context.setOutputType(outputType);
         context.setOutputBuyerPrefix("buyer");
@@ -65,8 +67,6 @@ public class TransformCommand {
         context.setOutputOtherIndex(0L);
         context.setImagePrefix("image");
         context.setImageIndex(0L);
-        context.setNextInputFile(null);
-        context.setOldNextInputFile(null);
         context.setConfig(config);
         return context;
     }
@@ -74,5 +74,24 @@ public class TransformCommand {
     private Split prepareInitialSplit(File inputFile, TransformerConfig config) {
         final Split initialSplit = splitHelper.buildRootSplit(inputFile, config);
         return initialSplit;
+    }
+
+    private static class DeepFirstTraversePolicy implements TransformerConfig.TraversePolicy {
+
+        @Override
+        public void addSplits(TransformerContext context, List<Split> splits) {
+            context.getSplitList().addAll(0, splits);
+        }
+
+        @Override
+        public Split nextSplit(TransformerContext context) {
+            Split result = null;
+
+            if (context.getSplitList().size() > 0) {
+                result = context.getSplitList().remove(0);
+            }
+
+            return result;
+        }
     }
 }
