@@ -1,5 +1,6 @@
 package com.taulia.devtask1.transformer.splitter;
 
+import com.taulia.devtask1.io.InputReader;
 import com.taulia.devtask1.io.OutputWriter;
 import com.taulia.devtask1.io.data.InvoiceRecord;
 import com.taulia.devtask1.transformer.consumer.TransformerConsumer;
@@ -40,22 +41,20 @@ public class SplittingConsumer implements TransformerConsumer {
     }
 
     @Override
-    public Consumer<InvoiceRecord> getRecordsConsumer() {
-        return r -> routeInvoice(r);
+    public Split[] process(InputReader<InvoiceRecord> inputReader) throws Exception {
+        Consumer<InvoiceRecord> recordsConsumer = getRecordsConsumer();
+        try {
+            inputReader.process(recordsConsumer);
+        }
+        finally {
+            closeStreams();
+        }
+
+        final Split[] splitArray = prepareSplits();
+        return splitArray != null ? splitArray : new Split[0];
     }
 
-    @Override
-    public Split[] process() throws Exception {
-        final Split[] splitArray = doProcess();
-        return splitArray;
-    }
-
-    @Override
-    public void finish() throws Exception {
-        doCleanUp();
-    }
-
-    private void doCleanUp() throws IOException {
+    private void closeStreams() throws IOException {
         final List<Exception> list = new LinkedList<>();
 
         for (Map.Entry<Long, TransformerContext.FileContext> entry : childSplitIndexToFileContext.entrySet()) {
@@ -67,12 +66,14 @@ public class SplittingConsumer implements TransformerConsumer {
                 list.add(exc);
             }
         }
-        childSplitIndexToFileContext.clear();
-
 
         if (! list.isEmpty()) {
             throw new IOException("Multiple io exceptions occurred during clean up: " + list.toString());
         }
+    }
+
+    private Consumer<InvoiceRecord> getRecordsConsumer() {
+        return r -> routeInvoice(r);
     }
 
     private void routeInvoice(InvoiceRecord invoiceRecord) {
@@ -111,7 +112,7 @@ public class SplittingConsumer implements TransformerConsumer {
         };
     }
 
-    public Split[] doProcess() throws IOException {
+    public Split[] prepareSplits() throws IOException {
         List<Split> result = new ArrayList<>();
 
         for (Map.Entry<Long, TransformerContext.FileContext> entry : childSplitIndexToFileContext.entrySet()) {

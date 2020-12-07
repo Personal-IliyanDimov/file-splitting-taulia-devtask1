@@ -1,12 +1,13 @@
 package com.taulia.devtask1.transformer.disk;
 
+import com.taulia.devtask1.io.InputReader;
 import com.taulia.devtask1.io.OutputWriter;
 import com.taulia.devtask1.io.data.InvoiceRecord;
 import com.taulia.devtask1.transformer.consumer.TransformerConsumer;
 import com.taulia.devtask1.transformer.helper.TransformerContext;
 import com.taulia.devtask1.transformer.splitter.Split;
+import com.taulia.devtask1.transformer.splitter.SplitHelper;
 import com.taulia.devtask1.transformer.strategy.Strategy;
-import com.taulia.devtask1.transformer.strategy.StrategySelector;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -20,34 +21,31 @@ import java.util.function.Consumer;
 @Slf4j
 public class DiskConsumer implements TransformerConsumer {
     private final TransformerContext context;
-    private final StrategySelector strategySelector;
+    private final SplitHelper splitHelper;
 
     private Map<String, TransformerContext.FileContext> buyerToFileContext;
     private TransformerContext.FileContext otherFileContext;
 
     public DiskConsumer(TransformerContext context) {
         this.context = context;
-        this.strategySelector = new StrategySelector();
+        this.splitHelper = new SplitHelper();
         this.buyerToFileContext = new HashMap<>();
     }
 
     @Override
-    public Consumer<InvoiceRecord> getRecordsConsumer() {
-        return r -> routeInvoice(r);
-    }
-
-    @Override
-    public Split[] process() throws IOException {
-        final Split split = doProcess();
+    public Split[] process(InputReader<InvoiceRecord> inputReader) throws Exception {
+        Consumer<InvoiceRecord> recordsConsumer = getRecordsConsumer();
+        try {
+            inputReader.process(recordsConsumer);
+        }
+        finally {
+            closeStreams();
+        }
+        final Split split = prepareSplit();
         return split != null ? new Split[] { split } : new Split[0];
     }
 
-    @Override
-    public void finish() throws Exception {
-        doCleanUp();
-    }
-
-    private void doCleanUp() throws IOException {
+    private void closeStreams() throws IOException {
         final List<Exception> list = new LinkedList<>();
 
         for (Map.Entry<String, TransformerContext.FileContext> entry : buyerToFileContext.entrySet()) {
@@ -59,7 +57,6 @@ public class DiskConsumer implements TransformerConsumer {
                 list.add(exc);
             }
         }
-        buyerToFileContext.clear();
 
         if (otherFileContext != null) {
             try {
@@ -68,12 +65,15 @@ public class DiskConsumer implements TransformerConsumer {
                 log.error("Unable to close file. ", exc);
                 list.add(exc);
             }
-            otherFileContext = null;
         }
 
         if (! list.isEmpty()) {
             throw new IOException("Multiple io exceptions occurred during clean up: " + list.toString());
         }
+    }
+
+    private Consumer<InvoiceRecord> getRecordsConsumer() {
+        return r -> routeInvoice(r);
     }
 
     private void routeInvoice(InvoiceRecord invoiceRecord) {
@@ -129,21 +129,16 @@ public class DiskConsumer implements TransformerConsumer {
         };
     }
 
-    public Split doProcess() throws IOException {
+    public Split prepareSplit() throws IOException {
         if (otherFileContext == null) {
             return null;
         }
 
-        final File outputFile = otherFileContext.getOutputFile();
-        final Strategy strategy = strategySelector.select(outputFile, context.getCurrentSplit(), context.getConfig());
-
-        final Split otherSplit = new Split();
-        otherSplit.setInputFile(outputFile);
-        otherSplit.setDeleteInput(true);
-        otherSplit.setStrategy(strategy);
-
+        final Split otherSplit = splitHelper.buildSplit(otherFileContext.getOutputFile(),
+                                                        context.getCurrentSplit(),
+                                                        context.getConfig());
         if (Strategy.SPLIT.equals(otherSplit.getStrategy())) {
-            throw new IllegalStateException("Unexpected strategy is provided: " + strategy);
+            throw new IllegalStateException("Unexpected strategy is provided. ");
         }
 
         return otherSplit;

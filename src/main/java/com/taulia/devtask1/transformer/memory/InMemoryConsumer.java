@@ -1,5 +1,6 @@
 package com.taulia.devtask1.transformer.memory;
 
+import com.taulia.devtask1.io.InputReader;
 import com.taulia.devtask1.io.OutputWriter;
 import com.taulia.devtask1.io.data.InvoiceRecord;
 import com.taulia.devtask1.transformer.consumer.TransformerConsumer;
@@ -23,7 +24,20 @@ public class InMemoryConsumer implements TransformerConsumer {
     }
 
     @Override
-    public Consumer<InvoiceRecord> getRecordsConsumer() {
+    public Split[] process(InputReader<InvoiceRecord> inputReader) throws Exception {
+        Consumer<InvoiceRecord> recordsConsumer = getRecordsConsumer();
+        try {
+            inputReader.process(recordsConsumer);
+            doProcess();
+        }
+        finally {
+            finish();
+        }
+
+        return new Split[0];
+    }
+
+    private Consumer<InvoiceRecord> getRecordsConsumer() {
         return r -> {
             List<InvoiceRecord> list = buyerToInvoiceListMap.get(r.getBuyer());
             if (list == null) {
@@ -33,17 +47,6 @@ public class InMemoryConsumer implements TransformerConsumer {
             list.add(r);
 
         };
-    }
-
-    @Override
-    public Split[] process() throws Exception {
-        doProcess();
-        return new Split[0];
-    }
-
-    @Override
-    public void finish() throws Exception {
-        buyerToInvoiceListMap.clear();
     }
 
     private void doProcess() throws Exception {
@@ -67,6 +70,10 @@ public class InMemoryConsumer implements TransformerConsumer {
                 }
             }
         }
+    }
+
+    private void finish() throws Exception {
+        buyerToInvoiceListMap.clear();
     }
 
     private OutputWriter.ImageContext prepareImageContext() {

@@ -17,16 +17,11 @@ public abstract class AbstractTransformer implements Transformer {
 
     @Override
     public Split[] transform(TransformerContext context) throws Exception {
-        final TransformerConsumer transformerConsumer = getConsumer(context);
-
         final File inputFile = context.getCurrentSplit().getInputFile();
         final InputReader<InvoiceRecord> inputReader = findReader(inputFile);
-        try {
-            inputReader.process(transformerConsumer.getRecordsConsumer());
-            return transformerConsumer.process();
-        } finally {
-            transformerConsumer.finish();
-        }
+
+        final TransformerConsumer transformerConsumer = getConsumer(context);
+        return transformerConsumer.process(inputReader);
     }
 
     private InputReader<InvoiceRecord> findReader(File inputFile) throws IOException {
