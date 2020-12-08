@@ -1,8 +1,9 @@
 package com.taulia.devtask1.io.reader.converter;
 
+import com.taulia.devtask1.io.model.ExtendedInvoiceRecord;
 import com.taulia.devtask1.io.model.InvoiceRecord;
 
-public class InvoiceRecordToXmlElementConverter {
+public class ExtendedInvoiceRecordToXmlElementConverter {
     private static final String ELEMENT_ROW = "row";
     private static final String ELEMENT_BUYER = "buyer";
     private static final String ELEMENT_IMAGENAME = "image_name";
@@ -15,7 +16,9 @@ public class InvoiceRecordToXmlElementConverter {
     private static final String ELEMENT_INVOICEIMAGELOCATION = "invoice_image_location";
 
 
-    public String convert(InvoiceRecord record, String externalInvoiceImageLocation) {
+    public String convert(ExtendedInvoiceRecord extendedInvoiceRecord) {
+        final InvoiceRecord record = extendedInvoiceRecord.getInvoiceRecord();
+
         final StringBuilder sb = new StringBuilder();
         sb.append(buildStartTag(ELEMENT_ROW))
           .append(buildElement(ELEMENT_BUYER, record.getBuyer()))
@@ -26,7 +29,8 @@ public class InvoiceRecordToXmlElementConverter {
           .append(buildElement(ELEMENT_INVOICECURRENCY, record.getInvoiceCurrency()))
           .append(buildElement(ELEMENT_INVOICESTATUS, record.getInvoiceStatus()))
           .append(buildElement(ELEMENT_SUPPLIER, record.getSupplier()))
-          .append(buildElement(ELEMENT_INVOICEIMAGELOCATION, externalInvoiceImageLocation))
+
+          .append(buildElement(ELEMENT_INVOICEIMAGELOCATION, extendedInvoiceRecord.getInvoiceImageLocation()))
           .append(buildEndTag(ELEMENT_ROW));
 
         return sb.toString();

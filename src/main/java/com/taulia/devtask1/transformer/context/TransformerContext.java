@@ -1,21 +1,15 @@
-package com.taulia.devtask1.transformer.helper;
+package com.taulia.devtask1.transformer.context;
 
 import com.taulia.devtask1.io.OutputWriter;
-import com.taulia.devtask1.io.data.InvoiceRecord;
-import com.taulia.devtask1.io.reader.converter.InvoiceRecordToCsvRowConverter;
-import com.taulia.devtask1.io.reader.converter.InvoiceRecordToXmlElementConverter;
-import com.taulia.devtask1.io.writer.CsvWriter;
-import com.taulia.devtask1.io.writer.XmlWriter;
-import com.taulia.devtask1.transformer.splitter.Split;
+import com.taulia.devtask1.transformer.context.helper.GroupNameSelector;
+import com.taulia.devtask1.transformer.io.TransformerInputReader;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -26,8 +20,8 @@ public class TransformerContext {
     private OutputType outputType;
     private String outputSplitPrefix;
     private long outputSplitIndex;
-    private String outputBuyerPrefix;
-    private long outputBuyerIndex;
+    private String outputGroupPrefix;
+    private long outputGroupIndex;
     private String outputOtherPrefix;
     private long outputOtherIndex;
     private String imagePrefix;
@@ -44,12 +38,12 @@ public class TransformerContext {
         return fileContext;
     }
 
-    public FileContext nextBuyerContext() {
+    public FileContext nextGroupContext() {
         final FileContext fileContext = new FileContext();
         fileContext.setOutputFolder(outputFolder);
         fileContext.setOutputType(outputType);
-        fileContext.setOutputPrefix(outputBuyerPrefix);
-        fileContext.setOutputIndex(outputBuyerIndex ++);
+        fileContext.setOutputPrefix(outputGroupPrefix);
+        fileContext.setOutputIndex(outputGroupIndex ++);
         return fileContext;
     }
 
@@ -90,34 +84,21 @@ public class TransformerContext {
         XML
     }
 
-    @Getter
-    @Setter
-    @ToString
-    public static class FileContext {
-        private File outputFolder;
-        private String outputPrefix;
-        private long outputIndex;
-        private OutputType outputType;
-        private File outputFile;
-        private OutputWriter<InvoiceRecord> outputWriter;
-
-        public OutputWriter<InvoiceRecord> getOrCreateOutputWriter() throws IOException {
-            if (Objects.isNull(this.outputWriter)) {
-                switch (outputType) {
-                    case CSV:
-                        this.outputFile = new File(outputFolder, outputPrefix + "-" + outputIndex + ".csv");
-                        final CsvWriter csvWriter = new CsvWriter(outputFile, new InvoiceRecordToCsvRowConverter());
-                        this.outputWriter = csvWriter;
-                        break;
-
-                    case XML:
-                        this.outputFile = new File(outputFolder, outputPrefix + "-" + outputIndex + ".xml");
-                        final XmlWriter xmlWriter = new XmlWriter(outputFile, new InvoiceRecordToXmlElementConverter());
-                        this.outputWriter = xmlWriter;
-                        break;
-                }
+    public OutputWriter.ImageContext prepareImageContext() {
+        return new OutputWriter.ImageContext() {
+            @Override
+            public File generateFileName() {
+                return nextImageFile();
             }
-            return this.outputWriter;
-        }
+        };
+    }
+
+
+    public <T> GroupNameSelector<T, String> getGroupNameSelector() {
+        return null;
+    }
+
+    public <T> TransformerInputReader<T> findTransformerInputReader() {
+        return null;
     }
 }

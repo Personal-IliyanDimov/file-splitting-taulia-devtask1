@@ -1,7 +1,7 @@
 package com.taulia.devtask1.io.reader;
 
 import com.taulia.devtask1.io.InputReader;
-import com.taulia.devtask1.io.data.InvoiceRecord;
+import com.taulia.devtask1.io.model.InvoiceRecord;
 import lombok.RequiredArgsConstructor;
 
 import java.io.BufferedReader;

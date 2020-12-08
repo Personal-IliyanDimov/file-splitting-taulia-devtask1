@@ -1,22 +1,24 @@
 package com.taulia.devtask1.io.writer;
 
 import com.taulia.devtask1.io.OutputWriter;
-import com.taulia.devtask1.io.model.InvoiceRecord;
-import com.taulia.devtask1.io.reader.converter.csv.InvoiceRecordToCsvRowConverter;
+import com.taulia.devtask1.io.model.ExtendedInvoiceRecord;
+import com.taulia.devtask1.io.reader.converter.ExtendedInvoiceRecordToXmlElementConverter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.Objects;
 
-@Slf4j
 @RequiredArgsConstructor
-public class CsvWriter implements OutputWriter<InvoiceRecord> {
+public class IntXmlWriter implements OutputWriter<ExtendedInvoiceRecord> {
+
+    private static final String START = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+    private static final String ELEMENT_ROOT_START = "<root>";
+    private static final String ELEMENT_ROOT_END = "</root>";
+
     private final File outputFile;
-    private final InvoiceRecordToCsvRowConverter converter;
+    private final ExtendedInvoiceRecordToXmlElementConverter converter;
 
     private Writer writer;
 
@@ -27,24 +29,25 @@ public class CsvWriter implements OutputWriter<InvoiceRecord> {
         }
 
         writer = new PrintWriter(outputFile);
-        writer.write(converter.getHeaders() + System.lineSeparator());
+        writer.write(START + System.lineSeparator());
+        writer.write(ELEMENT_ROOT_START + System.lineSeparator());
     }
 
     @Override
-    public void process(InvoiceRecord input, ImageContext imageContext) throws IOException {
+    public void process(ExtendedInvoiceRecord input, ImageContext imageContext) throws IOException {
         writer.write(converter.convert(input) + System.lineSeparator());
     }
 
     @Override
     public void end() throws IOException {
+        writer.write(ELEMENT_ROOT_END);
     }
 
     @Override
     public void close() throws IOException {
-        if (Objects.isNull(writer)) {
+        if (writer == null) {
             return ;
         }
-
         writer.close();
     }
 }

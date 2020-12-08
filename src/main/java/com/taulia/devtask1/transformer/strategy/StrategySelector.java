@@ -1,7 +1,7 @@
 package com.taulia.devtask1.transformer.strategy;
 
-import com.taulia.devtask1.transformer.helper.TransformerConfig;
-import com.taulia.devtask1.transformer.splitter.Split;
+import com.taulia.devtask1.transformer.context.TransformerConfig;
+import com.taulia.devtask1.transformer.context.Split;
 
 import java.io.File;
 

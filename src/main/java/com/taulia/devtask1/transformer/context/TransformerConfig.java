@@ -1,6 +1,5 @@
-package com.taulia.devtask1.transformer.helper;
+package com.taulia.devtask1.transformer.context;
 
-import com.taulia.devtask1.transformer.splitter.Split;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,9 +1,8 @@
 package com.taulia.devtask1.transformer.consumer;
 
-import com.taulia.devtask1.io.InputReader;
-import com.taulia.devtask1.io.data.InvoiceRecord;
-import com.taulia.devtask1.transformer.splitter.Split;
+import com.taulia.devtask1.transformer.context.Split;
+import com.taulia.devtask1.transformer.io.TransformerInputReader;
 
-public interface TransformerConsumer {
-    public Split[] process(InputReader<InvoiceRecord> inputReader) throws Exception;
+public interface TransformerConsumer<T> {
+    public Split[] process(TransformerInputReader<T> inputReader) throws Exception;
 }

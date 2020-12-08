@@ -1,4 +1,4 @@
-package com.taulia.devtask1.io.data;
+package com.taulia.devtask1.io.model;
 
 import lombok.Getter;
 import lombok.Setter;

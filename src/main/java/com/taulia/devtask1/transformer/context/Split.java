@@ -1,4 +1,4 @@
-package com.taulia.devtask1.transformer.splitter;
+package com.taulia.devtask1.transformer.context;
 
 import com.taulia.devtask1.transformer.strategy.Strategy;
 import lombok.Getter;

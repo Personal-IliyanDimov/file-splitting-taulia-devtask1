@@ -3,13 +3,13 @@ package com.taulia.devtask1;
 
 import com.taulia.devtask1.transformer.CompositeTransformer;
 import com.taulia.devtask1.transformer.Transformer;
-import com.taulia.devtask1.transformer.disk.DiskTransformer;
-import com.taulia.devtask1.transformer.helper.TransformerConfig;
-import com.taulia.devtask1.transformer.helper.TransformerContext;
-import com.taulia.devtask1.transformer.memory.InMemoryTransformer;
-import com.taulia.devtask1.transformer.splitter.Split;
-import com.taulia.devtask1.transformer.splitter.SplitHelper;
-import com.taulia.devtask1.transformer.splitter.SplittingTransformer;
+import com.taulia.devtask1.transformer.DiskTransformer;
+import com.taulia.devtask1.transformer.context.TransformerConfig;
+import com.taulia.devtask1.transformer.context.TransformerContext;
+import com.taulia.devtask1.transformer.InMemoryTransformer;
+import com.taulia.devtask1.transformer.context.Split;
+import com.taulia.devtask1.transformer.context.helper.SplitHelper;
+import com.taulia.devtask1.transformer.SplittingTransformer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -59,8 +59,8 @@ public class TransformCommand {
         context.setSplitList(new ArrayList<>());
         context.setOutputFolder(outputFolder);
         context.setOutputType(outputType);
-        context.setOutputBuyerPrefix("buyer");
-        context.setOutputBuyerIndex(0L);
+        context.setOutputGroupPrefix("buyer");
+        context.setOutputGroupIndex(0L);
         context.setOutputOtherPrefix("other");
         context.setOutputOtherIndex(0L);
         context.setImagePrefix("image");

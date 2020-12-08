@@ -1,8 +1,8 @@
-package com.taulia.devtask1.transformer.splitter;
+package com.taulia.devtask1.transformer;
 
-import com.taulia.devtask1.transformer.AbstractTransformer;
+import com.taulia.devtask1.transformer.consumer.SplittingConsumer;
 import com.taulia.devtask1.transformer.consumer.TransformerConsumer;
-import com.taulia.devtask1.transformer.helper.TransformerContext;
+import com.taulia.devtask1.transformer.context.TransformerContext;
 
 public class SplittingTransformer extends AbstractTransformer {
     @Override

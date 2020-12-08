@@ -1,6 +1,6 @@
-package com.taulia.devtask1.io.reader.converter;
+package com.taulia.devtask1.io.reader.converter.csv;
 
-import com.taulia.devtask1.io.data.InvoiceRecord;
+import com.taulia.devtask1.io.model.InvoiceRecord;
 
 import java.util.function.Function;
 

@@ -1,6 +1,6 @@
 package com.taulia.devtask1;
 
-import com.taulia.devtask1.transformer.helper.TransformerContext;
+import com.taulia.devtask1.transformer.context.TransformerContext;
 
 import java.io.File;
 import java.io.IOException;

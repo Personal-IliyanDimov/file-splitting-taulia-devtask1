@@ -1,7 +1,7 @@
 package com.taulia.devtask1.io.writer;
 
 import com.taulia.devtask1.io.OutputWriter;
-import com.taulia.devtask1.io.data.InvoiceRecord;
+import com.taulia.devtask1.io.model.InvoiceRecord;
 import com.taulia.devtask1.io.reader.converter.InvoiceRecordToXmlElementConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

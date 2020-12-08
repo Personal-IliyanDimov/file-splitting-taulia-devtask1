@@ -1,6 +1,7 @@
-package com.taulia.devtask1.transformer.splitter;
+package com.taulia.devtask1.transformer.context.helper;
 
-import com.taulia.devtask1.transformer.helper.TransformerConfig;
+import com.taulia.devtask1.transformer.context.Split;
+import com.taulia.devtask1.transformer.context.TransformerConfig;
 import com.taulia.devtask1.transformer.strategy.Strategy;
 import com.taulia.devtask1.transformer.strategy.StrategySelector;
 

@@ -1,7 +1,7 @@
 package com.taulia.devtask1.transformer;
 
-import com.taulia.devtask1.transformer.helper.TransformerContext;
-import com.taulia.devtask1.transformer.splitter.Split;
+import com.taulia.devtask1.transformer.context.TransformerContext;
+import com.taulia.devtask1.transformer.context.Split;
 import com.taulia.devtask1.transformer.strategy.Strategy;
 import lombok.RequiredArgsConstructor;
 
