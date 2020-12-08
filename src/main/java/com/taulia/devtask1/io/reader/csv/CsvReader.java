@@ -1,4 +1,4 @@
-package com.taulia.devtask1.io.reader;
+package com.taulia.devtask1.io.reader.csv;
 
 import com.taulia.devtask1.io.InputReader;
 import com.taulia.devtask1.io.model.InvoiceRecord;

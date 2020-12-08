@@ -1,26 +1,25 @@
-package com.taulia.devtask1.io.writer;
+package com.taulia.devtask1.io.writer.xml;
 
 import com.taulia.devtask1.io.OutputWriter;
-import com.taulia.devtask1.io.model.ExtendedInvoiceRecord;
-import com.taulia.devtask1.io.reader.converter.ExtendedInvoiceRecordToXmlElementConverter;
-import lombok.RequiredArgsConstructor;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 
-@RequiredArgsConstructor
-public class IntXmlWriter implements OutputWriter<ExtendedInvoiceRecord> {
+public abstract class AbstractXmlWriter<T> implements OutputWriter<T> {
 
     private static final String START = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
     private static final String ELEMENT_ROOT_START = "<root>";
     private static final String ELEMENT_ROOT_END = "</root>";
 
     private final File outputFile;
-    private final ExtendedInvoiceRecordToXmlElementConverter converter;
-
     private Writer writer;
+
+    public AbstractXmlWriter(File outputFile) {
+        this.outputFile = outputFile;
+    }
+
 
     @Override
     public void init() throws IOException {
@@ -34,11 +33,6 @@ public class IntXmlWriter implements OutputWriter<ExtendedInvoiceRecord> {
     }
 
     @Override
-    public void process(ExtendedInvoiceRecord input, ImageContext imageContext) throws IOException {
-        writer.write(converter.convert(input) + System.lineSeparator());
-    }
-
-    @Override
     public void end() throws IOException {
         writer.write(ELEMENT_ROOT_END);
     }
@@ -49,5 +43,9 @@ public class IntXmlWriter implements OutputWriter<ExtendedInvoiceRecord> {
             return ;
         }
         writer.close();
+    }
+
+    protected Writer getWriter() {
+        return writer;
     }
 }

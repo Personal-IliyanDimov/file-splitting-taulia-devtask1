@@ -1,4 +1,4 @@
-package com.taulia.devtask1.io.reader.converter.csv;
+package com.taulia.devtask1.io.writer.converter.csv;
 
 import com.taulia.devtask1.io.model.InvoiceRecord;
 
