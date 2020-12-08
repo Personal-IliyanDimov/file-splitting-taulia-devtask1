@@ -16,13 +16,13 @@ public class TransformerIOHelper {
     private IOHelper ioHelper;
 
     public <T> TransformerInputReader<T> buildReader(File inputFile, Function<Object, T> converter) throws IOException {
-        final InputReader<?> inputReader = ioHelper.buildReader(inputFile);
+        final InputReader<? extends Object> inputReader = ioHelper.buildReader(inputFile);
         final TransformerInputReaderAdapter<T> adapter = new TransformerInputReaderAdapter<>(inputReader, converter);
         return adapter;
     }
 
-    public <T,P> TransformerOutputWriter<T> buildWriter(File outputFile, OutputWriter.ImageContext imageContext, Function<T, P> converter) {
-        final OutputWriter<P> outputWriter = ioHelper.buildWriter(outputFile, clazz);
+    public <T,P> TransformerOutputWriter<T> buildWriter(File outputFile, OutputWriter.ImageContext imageContext, Function<T, P> converter) throws IOException {
+        final OutputWriter<?> outputWriter = ioHelper.buildWriter(outputFile);
         final TransformerOutputWriterAdapter adapter = new TransformerOutputWriterAdapter(outputWriter, converter, imageContext);
         return adapter;
     }

@@ -10,7 +10,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class TransformerInputReaderAdapter<T> implements TransformerInputReader<T> {
 
-    private final InputReader<?> inputReader;
+    private final InputReader<? extends Object> inputReader;
     private final Function<Object, T> transformFunction;
 
     public void process(Consumer<T> recordConsumer) throws Exception {

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
-public class TransformerOutputWriterAdapter<T,P> implements TransformerOutputWriter<T> {
+public class TransformerOutputWriterAdapter<T, P> implements TransformerOutputWriter<T> {
 
     private final OutputWriter<P> delegate;
     private final Function<T, P> converter;

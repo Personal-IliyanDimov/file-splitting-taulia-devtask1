@@ -2,18 +2,20 @@ package com.taulia.devtask1;
 
 
 import com.taulia.devtask1.transformer.CompositeTransformer;
-import com.taulia.devtask1.transformer.Transformer;
 import com.taulia.devtask1.transformer.DiskTransformer;
+import com.taulia.devtask1.transformer.InMemoryTransformer;
+import com.taulia.devtask1.transformer.SplittingTransformer;
+import com.taulia.devtask1.transformer.Transformer;
+import com.taulia.devtask1.transformer.context.Split;
 import com.taulia.devtask1.transformer.context.TransformerConfig;
 import com.taulia.devtask1.transformer.context.TransformerContext;
-import com.taulia.devtask1.transformer.InMemoryTransformer;
-import com.taulia.devtask1.transformer.context.Split;
 import com.taulia.devtask1.transformer.context.helper.SplitHelper;
-import com.taulia.devtask1.transformer.SplittingTransformer;
+import com.taulia.devtask1.transformer.io.model.TransformedItem;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class TransformCommand {
 
@@ -23,10 +25,20 @@ public class TransformCommand {
     public TransformCommand() {
         helper = new SplitHelper();
 
-        final Transformer splittingTransformer = new SplittingTransformer();
-        final Transformer diskTransformer = new DiskTransformer();
-        final Transformer inMemoryTransformer = new InMemoryTransformer();
+        final Function<Object, TransformedItem<?>> transformFunction = getTransformFunction();
+        final Transformer splittingTransformer = new SplittingTransformer<TransformedItem<?>>(transformFunction);
+        final Transformer diskTransformer = new DiskTransformer<TransformedItem<?>>(transformFunction);
+        final Transformer inMemoryTransformer = new InMemoryTransformer<TransformedItem<?>>(transformFunction);
         compositeTransformer = new CompositeTransformer(splittingTransformer, diskTransformer, inMemoryTransformer);
+    }
+
+    private Function<Object, TransformedItem<?>> getTransformFunction() {
+        return o -> new TransformedItem<Object>() {
+            @Override
+            public Object getPayload() {
+                return o;
+            }
+        };
     }
 
     public void executeCommand(File inputFile, File outputFolder, TransformerContext.OutputType outputType) {

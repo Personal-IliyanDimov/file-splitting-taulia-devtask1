@@ -2,7 +2,7 @@ package com.taulia.devtask1.transformer.context;
 
 import com.taulia.devtask1.io.OutputWriter;
 import com.taulia.devtask1.transformer.context.helper.GroupNameSelector;
-import com.taulia.devtask1.transformer.io.TransformerInputReader;
+import com.taulia.devtask1.transformer.context.helper.SplitSourceSelector;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -79,11 +79,6 @@ public class TransformerContext {
         this.currentSplit = nextSplit;
     }
 
-    public static enum OutputType {
-        CSV,
-        XML
-    }
-
     public OutputWriter.ImageContext prepareImageContext() {
         return new OutputWriter.ImageContext() {
             @Override
@@ -93,12 +88,15 @@ public class TransformerContext {
         };
     }
 
-
-    public <T> GroupNameSelector<T, String> getGroupNameSelector() {
+    public SplitSourceSelector<Object, String> getSplitSourceSelector() {
+        return null;
+    }
+    public GroupNameSelector<Object, String> getGroupNameSelector() {
         return null;
     }
 
-    public <T> TransformerInputReader<T> findTransformerInputReader() {
-        return null;
+    public static enum OutputType {
+        CSV,
+        XML
     }
 }

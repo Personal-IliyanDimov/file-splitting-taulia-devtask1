@@ -38,6 +38,7 @@ public class SplittingConsumer<T> implements TransformerConsumer<T> {
         final long splitFactor = splitDetails.getSplitFactor();
         final Function<Long, Function<String, Long>> factory = splitDetails.getSplitFunctionFactory();
 
+        this.splitSourceSelector = splitDetails.getSplitSourceSelector();
         this.splitFunction = factory.apply(splitFactor);
         this.childSplitIndexToFileContext = new HashMap<>();
     }
