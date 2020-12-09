@@ -10,31 +10,24 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 @Getter
 @Setter
-public class TransformerContext {
+public class TransformerContext<T> {
     private Split currentSplit;
     private ArrayList<Split> splitList;
     private File outputFolder;
     private OutputType outputType;
-    private String outputSplitPrefix;
-    private long outputSplitIndex;
-    private String outputGroupPrefix;
-    private long outputGroupIndex;
-    private String outputOtherPrefix;
-    private long outputOtherIndex;
-    private String imagePrefix;
-    private long imageIndex;
-
+    private NamingContext namingContext;
     private TransformerConfig config;
 
     public FileContext nextSplitContext() {
         final FileContext fileContext = new FileContext();
         fileContext.setOutputFolder(outputFolder);
         fileContext.setOutputType(outputType);
-        fileContext.setOutputPrefix(outputSplitPrefix);
-        fileContext.setOutputIndex(outputSplitIndex ++);
+        fileContext.setOutputPrefix(namingContext.getOutputSplitPrefix());
+        fileContext.setOutputIndex(namingContext.getAndIncrementSplitIndex());
         return fileContext;
     }
 
@@ -42,8 +35,8 @@ public class TransformerContext {
         final FileContext fileContext = new FileContext();
         fileContext.setOutputFolder(outputFolder);
         fileContext.setOutputType(outputType);
-        fileContext.setOutputPrefix(outputGroupPrefix);
-        fileContext.setOutputIndex(outputGroupIndex ++);
+        fileContext.setOutputPrefix(namingContext.getOutputGroupPrefix());
+        fileContext.setOutputIndex(namingContext.getAndIncrementGroupIndex());
         return fileContext;
     }
 
@@ -51,14 +44,14 @@ public class TransformerContext {
         final FileContext fileContext = new FileContext();
         fileContext.setOutputFolder(outputFolder);
         fileContext.setOutputType(outputType);
-        fileContext.setOutputPrefix(outputOtherPrefix);
-        fileContext.setOutputIndex(outputOtherIndex ++);
+        fileContext.setOutputPrefix(namingContext.getOutputOtherPrefix());
+        fileContext.setOutputIndex(namingContext.getAndIncrementOtherIndex());
         return fileContext;
     }
 
     public File nextImageFile() {
-        final long currentImageIndex = imageIndex ++;
-        return new File(outputFolder, imagePrefix + "-" + currentImageIndex + ".img");
+        final long currentImageIndex = namingContext.getAndIncrementImageIndex();
+        return new File(outputFolder, namingContext.getImagePrefix() + "-" + currentImageIndex + ".img");
 
     }
 
@@ -88,10 +81,15 @@ public class TransformerContext {
         };
     }
 
-    public SplitSourceSelector<Object, String> getSplitSourceSelector() {
+    public Function<Object, T> getTransformFunction() {
         return null;
     }
-    public GroupNameSelector<Object, String> getGroupNameSelector() {
+
+    public GroupNameSelector<T, String> getGroupNameSelector() {
+        return null;
+    }
+
+    public SplitSourceSelector<T, String> getSplitSourceSelector() {
         return null;
     }
 

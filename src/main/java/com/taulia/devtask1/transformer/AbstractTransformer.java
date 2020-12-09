@@ -7,25 +7,21 @@ import com.taulia.devtask1.transformer.io.TransformerInputReader;
 import com.taulia.devtask1.transformer.io.helper.TransformerIOHelper;
 
 import java.io.IOException;
-import java.util.function.Function;
 
-public abstract class AbstractTransformer<T> implements Transformer {
+public abstract class AbstractTransformer<T> implements Transformer<T> {
 
     @Override
-    public Split[] transform(TransformerContext context) throws Exception {
+    public Split[] transform(TransformerContext<T> context) throws Exception {
         final TransformerInputReader<T> transformerInputReader = findTransformerInputReader(context);
         final TransformerConsumer<T> transformerConsumer = getConsumer(context);
         return transformerConsumer.process(transformerInputReader);
     }
 
-    protected TransformerInputReader<T> findTransformerInputReader(TransformerContext context) throws IOException {
+    protected TransformerInputReader<T> findTransformerInputReader(TransformerContext<T> context) throws IOException {
         final TransformerIOHelper helper = new TransformerIOHelper();
-        final TransformerInputReader<T> tiReader = helper.buildReader(context.getCurrentSplit().getInputFile(), getTransformFunction());
+        final TransformerInputReader<T> tiReader = helper.buildReader(context.getCurrentSplit().getInputFile(), context.getTransformFunction());
         return tiReader;
     }
 
-    protected abstract TransformerConsumer<T> getConsumer(TransformerContext context);
-
-    protected abstract Function<Object, T> getTransformFunction();
-
+    protected abstract TransformerConsumer<T> getConsumer(TransformerContext<T> context);
 }

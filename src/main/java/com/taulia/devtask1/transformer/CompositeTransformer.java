@@ -10,19 +10,19 @@ import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class CompositeTransformer implements Transformer {
+public class CompositeTransformer<T> implements Transformer<T> {
 
-    private final Transformer splittingTransformer;
-    private final Transformer diskTransformer;
-    private final Transformer inMemoryTransformer;
+    private final Transformer<T> splittingTransformer;
+    private final Transformer<T> diskTransformer;
+    private final Transformer<T> inMemoryTransformer;
 
     @Override
-    public Split[] transform(TransformerContext initialContext) throws Exception {
+    public Split[] transform(TransformerContext<T> initialContext) throws Exception {
         doTransform(initialContext);
         return new Split[0];
     }
 
-    private void doTransform(TransformerContext context) throws Exception {
+    private void doTransform(TransformerContext<T> context) throws Exception {
         while (context.getCurrentSplit() != null) {
             final Strategy strategy = context.getCurrentSplit().getStrategy();
 
@@ -49,7 +49,7 @@ public class CompositeTransformer implements Transformer {
         }
     }
 
-    private void advanceContext(TransformerContext context, List<Split> additionalSplits) throws IOException {
+    private void advanceContext(TransformerContext<T> context, List<Split> additionalSplits) throws IOException {
         context.addSplits(additionalSplits);
         context.rotateCurrentSplit();
     }

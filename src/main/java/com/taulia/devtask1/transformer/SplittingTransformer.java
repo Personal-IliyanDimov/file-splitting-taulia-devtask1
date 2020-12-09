@@ -5,20 +5,11 @@ import com.taulia.devtask1.transformer.consumer.TransformerConsumer;
 import com.taulia.devtask1.transformer.context.TransformerContext;
 import lombok.RequiredArgsConstructor;
 
-import java.util.function.Function;
-
 @RequiredArgsConstructor
 public class SplittingTransformer<T> extends AbstractTransformer<T> {
 
-    private final Function<Object, T> transformFunction;
-
     @Override
-    protected TransformerConsumer getConsumer(TransformerContext context) {
+    protected TransformerConsumer getConsumer(TransformerContext<T> context) {
         return new SplittingConsumer(context);
-    }
-
-    @Override
-    protected Function<Object, T> getTransformFunction() {
-        return transformFunction;
     }
 }

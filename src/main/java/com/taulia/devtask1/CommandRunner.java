@@ -43,4 +43,14 @@ public class CommandRunner {
 		command.executeCommand(inputFile, outputFolder, outputType);
 	}
 
+	//    private Function<Object, TransformedItem<?>> getTransformFunction() {
+	//        return o -> new TransformedItem<Object>() {
+	//            @Override
+	//            public Object getPayload() {
+	//                return o;
+	//            }
+	//        };
+	//    }
+
+
 }
