@@ -92,9 +92,10 @@ public class SplittingConsumer<T> implements TransformerConsumer<T> {
 
             final FileContext fileContext = context.nextSplitContext();
             final File outputFile = context.getFileNameProducer().apply(fileContext);
-            final TransformerOutputWriter<T> outputWriter = context.getIoContext().buildWriter(outputFile);
+            TransformerOutputWriter<T> outputWriter = null;
 
             try {
+                outputWriter = context.getIoContext().buildWriter(outputFile);
                 outputWriter.init();
             } catch (IOException ioe) {
                 throw new RuntimeException("Unable to create output writer: " + fileContext, ioe);

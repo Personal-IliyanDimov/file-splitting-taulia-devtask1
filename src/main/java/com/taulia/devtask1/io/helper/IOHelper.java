@@ -21,7 +21,7 @@ import java.util.Locale;
 
 public class IOHelper {
 
-    public InputReader<? extends Object> buildReader(File inputFile) throws IOException {
+    public InputReader<?> buildReader(File inputFile) throws IOException {
         InputReader<?> result;
         final String canonicalPath = inputFile.getCanonicalPath().toLowerCase(Locale.ROOT);
 

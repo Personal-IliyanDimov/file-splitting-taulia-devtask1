@@ -19,8 +19,9 @@ public class TransformerContext<T> {
     private ArrayList<Split> splitList;
     private File outputFolder;
     private OutputType outputType;
-    private IOContext ioContext;
+    private IOContext<T> ioContext;
     private NamingContext namingContext;
+    private GenericContext<T> genericContext;
     private TransformerConfig config;
 
 
@@ -84,27 +85,28 @@ public class TransformerContext<T> {
     }
 
     public Function<Object, T> getWrapperFunction() {
-        return null;
+        return genericContext.getWrapperFunction();
     }
 
     public Function<T, Object> getUnwrapperFunction() {
-        return null;
+        return genericContext.getUnwrapperFunction();
     }
 
     public GroupNameSelector<T, String> getGroupNameSelector() {
-        return null;
+        return genericContext.getGroupNameSelector();
     }
 
     public SplitSourceSelector<T, String> getSplitSourceSelector() {
-        return null;
+        return genericContext.getSplitSourceSelector();
     }
 
     public Function<FileContext, File> getFileNameProducer() {
-        return null;
+        return genericContext.getFileNameProducer();
     }
 
     public static enum OutputType {
         CSV,
-        XML
+        XML,
+        INTXML;
     }
 }

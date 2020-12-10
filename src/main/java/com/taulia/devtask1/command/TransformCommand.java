@@ -1,4 +1,4 @@
-package com.taulia.devtask1;
+package com.taulia.devtask1.command;
 
 
 import com.taulia.devtask1.transformer.CompositeTransformer;
@@ -6,6 +6,7 @@ import com.taulia.devtask1.transformer.DiskTransformer;
 import com.taulia.devtask1.transformer.InMemoryTransformer;
 import com.taulia.devtask1.transformer.SplittingTransformer;
 import com.taulia.devtask1.transformer.Transformer;
+import com.taulia.devtask1.transformer.context.GenericContext;
 import com.taulia.devtask1.transformer.context.NamingContext;
 import com.taulia.devtask1.transformer.context.Split;
 import com.taulia.devtask1.transformer.context.TransformerConfig;
@@ -16,7 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransformCommand<T> {
+public abstract class TransformCommand<T> {
 
     private SplitHelper helper;
     private CompositeTransformer<T> compositeTransformer;
@@ -65,12 +66,14 @@ public class TransformCommand<T> {
                 "image", 0
         );
 
-        final TransformerContext context = new TransformerContext();
+        final TransformerContext<T> context = new TransformerContext();
         context.setCurrentSplit(prepareInitialSplit(inputFile, config));
         context.setSplitList(new ArrayList<>());
         context.setOutputFolder(outputFolder);
         context.setOutputType(outputType);
+        context.setIoContext(new IOContextImpl(context));
         context.setNamingContext(namingContext);
+        context.setGenericContext(buildGenericContext());
         context.setConfig(config);
         return context;
     }
@@ -97,4 +100,6 @@ public class TransformCommand<T> {
             return result;
         }
     }
+
+    protected abstract GenericContext<T> buildGenericContext();
 }

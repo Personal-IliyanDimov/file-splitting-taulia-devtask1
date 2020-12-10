@@ -1,6 +1,11 @@
 package com.taulia.devtask1;
 
+import com.taulia.devtask1.command.TransformCommand;
+import com.taulia.devtask1.io.model.ExtendedInvoiceRecord;
+import com.taulia.devtask1.io.model.InvoiceRecord;
+import com.taulia.devtask1.transformer.context.GenericContext;
 import com.taulia.devtask1.transformer.context.TransformerContext;
+import com.taulia.devtask1.transformer.io.model.TransformedItem;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,18 +44,56 @@ public class CommandRunner {
 			return ;
 		}
 
-		final TransformCommand command = new TransformCommand();
+		final TransformCommand command = new InvoiceTransformerCommand();
 		command.executeCommand(inputFile, outputFolder, outputType);
 	}
 
-	//    private Function<Object, TransformedItem<?>> getTransformFunction() {
-	//        return o -> new TransformedItem<Object>() {
-	//            @Override
-	//            public Object getPayload() {
-	//                return o;
-	//            }
-	//        };
-	//    }
+	protected static class InvoiceTransformerCommand extends TransformCommand<TransformedItem<?>> {
+		@Override
+		protected GenericContext<TransformedItem<?>> buildGenericContext() {
+			return new GenericContext<TransformedItem<?>>(
+				o -> new TransformedItem<Object>(o),
+				ti -> ti.getPayload(),
+				ti -> {
+					final Object payload = ti.getPayload();
+					if (payload instanceof InvoiceRecord) {
+						return ((InvoiceRecord) payload).getBuyer();
+					}
+					else if (payload instanceof ExtendedInvoiceRecord) {
+						return ((ExtendedInvoiceRecord) payload).getInvoiceRecord().getBuyer();
+					} else {
+						throw new RuntimeException("Unknown payload type !!!");
+					}
+				},
+				ti -> {
+					final Object payload = ti.getPayload();
+					if (payload instanceof InvoiceRecord) {
+						return ((InvoiceRecord) payload).getBuyer();
+					}
+					else if (payload instanceof ExtendedInvoiceRecord) {
+						return ((ExtendedInvoiceRecord) payload).getInvoiceRecord().getBuyer();
+					} else {
+						throw new RuntimeException("Unknown payload type !!!");
+					}
+				},
+				fc -> {
+					File file = null;
+					switch (fc.getOutputType()) {
+						case CSV:
+							file = new File(fc.getOutputFolder(), fc.getOutputPrefix() + "-" + fc.getOutputIndex() + ".csv");
+							break;
 
+						case XML:
+							file = new File(fc.getOutputFolder(), fc.getOutputPrefix() + "-" + fc.getOutputIndex() + ".xml");
+							break;
 
+						case INTXML:
+							file = new File(fc.getOutputFolder(), fc.getOutputPrefix() + "-" + fc.getOutputIndex() + ".int-xml");
+							break;
+					}
+					return file;
+				}
+			);
+		}
+	}
 }
