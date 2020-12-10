@@ -4,7 +4,6 @@ import com.taulia.devtask1.transformer.consumer.TransformerConsumer;
 import com.taulia.devtask1.transformer.context.Split;
 import com.taulia.devtask1.transformer.context.TransformerContext;
 import com.taulia.devtask1.transformer.io.TransformerInputReader;
-import com.taulia.devtask1.transformer.io.helper.TransformerIOHelper;
 
 import java.io.IOException;
 
@@ -18,9 +17,7 @@ public abstract class AbstractTransformer<T> implements Transformer<T> {
     }
 
     protected TransformerInputReader<T> findTransformerInputReader(TransformerContext<T> context) throws IOException {
-        final TransformerIOHelper helper = new TransformerIOHelper();
-        final TransformerInputReader<T> tiReader = helper.buildReader(context.getCurrentSplit().getInputFile(), context.getTransformFunction());
-        return tiReader;
+        return context.getIoContext().buildReader(context.getCurrentSplit().getInputFile());
     }
 
     protected abstract TransformerConsumer<T> getConsumer(TransformerContext<T> context);

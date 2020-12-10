@@ -1,14 +1,17 @@
 package com.taulia.devtask1.transformer.consumer;
 
+import com.taulia.devtask1.transformer.consumer.io.OutputInfo;
 import com.taulia.devtask1.transformer.context.FileContext;
 import com.taulia.devtask1.transformer.context.Split;
 import com.taulia.devtask1.transformer.context.TransformerContext;
 import com.taulia.devtask1.transformer.context.helper.GroupNameSelector;
 import com.taulia.devtask1.transformer.context.helper.SplitHelper;
 import com.taulia.devtask1.transformer.io.TransformerInputReader;
+import com.taulia.devtask1.transformer.io.TransformerOutputWriter;
 import com.taulia.devtask1.transformer.strategy.Strategy;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,17 +21,17 @@ import java.util.function.Consumer;
 
 @Slf4j
 public class DiskConsumer<T> implements TransformerConsumer<T> {
-    private final TransformerContext context;
+    private final TransformerContext<T> context;
     private final SplitHelper splitHelper;
-    private GroupNameSelector<T, String> groupNameSelector;
-    private Map<String, FileContext> groupToFileContext;
-    private FileContext otherFileContext;
+    private final GroupNameSelector<T, String> groupNameSelector;
+    private final Map<String, OutputInfo<T>> groupToOutputInfoMap;
+    private OutputInfo<T> otherOutputInfo;
 
-    public DiskConsumer(TransformerContext context) {
+    public DiskConsumer(TransformerContext<T> context) {
         this.context = context;
         this.splitHelper = new SplitHelper();
         this.groupNameSelector = context.getGroupNameSelector();
-        this.groupToFileContext = new HashMap<>();
+        this.groupToOutputInfoMap = new HashMap<>();
     }
 
     @Override
@@ -47,19 +50,19 @@ public class DiskConsumer<T> implements TransformerConsumer<T> {
     private void closeStreams() throws IOException {
         final List<Exception> list = new LinkedList<>();
 
-        for (Map.Entry<String, FileContext> entry : groupToFileContext.entrySet()) {
+        for (Map.Entry<String, OutputInfo<T>> entry : groupToOutputInfoMap.entrySet()) {
             try {
-                final FileContext fileContext = entry.getValue();
-                fileContext.getOrCreateOutputWriter().close();
+                final OutputInfo<T> outputInfo = entry.getValue();
+                outputInfo.getOutputWriter().close();
             } catch (Exception exc) {
                 log.error("Unable to close file. ", exc);
                 list.add(exc);
             }
         }
 
-        if (otherFileContext != null) {
+        if (otherOutputInfo != null) {
             try {
-                otherFileContext.getOrCreateOutputWriter().close();
+                otherOutputInfo.getOutputWriter().close();
             } catch (Exception exc) {
                 log.error("Unable to close file. ", exc);
                 list.add(exc);
@@ -77,52 +80,63 @@ public class DiskConsumer<T> implements TransformerConsumer<T> {
 
     private void routeInvoice(T t) {
         final String group = groupNameSelector.groupName(t);
-        if (groupToFileContext.containsKey(group)) {
-            appendToContext(groupToFileContext.get(group), t);
+        if (groupToOutputInfoMap.containsKey(group)) {
+            appendToContext(groupToOutputInfoMap.get(group), t);
         }
         else {
 
-              if (groupToFileContext.keySet().size() < context.getConfig().getMaxOpenHandlers()) {
+              if (groupToOutputInfoMap.keySet().size() < context.getConfig().getMaxOpenHandlers()) {
                   final FileContext fileContext = context.nextGroupContext();
+
+                  final File outputFile = context.getFileNameProducer().apply(fileContext);
+                  final TransformerOutputWriter<T> outputWriter = context.getIoContext().buildWriter(outputFile);
+
                   try {
-                      fileContext.getOrCreateOutputWriter().init();
-                  } catch (IOException ioe) {
+                      outputWriter.init();
+                  }
+                  catch (IOException ioe) {
                       throw new RuntimeException("Unable to create output writer: " + fileContext, ioe);
                   }
 
-                  groupToFileContext.put(group, fileContext);
-                  appendToContext(fileContext, t);
+                  final OutputInfo<T> outputInfo = new OutputInfo<>(outputFile, outputWriter);
+                  groupToOutputInfoMap.put(group, outputInfo);
+                  appendToContext(outputInfo, t);
               }
               else {
 
-                  if (otherFileContext == null) {
+                  if (otherOutputInfo == null) {
                       final FileContext otherFileContext = context.nextOtherContext();
+                      final File otherOutputFile = context.getFileNameProducer().apply(otherFileContext);
+                      final TransformerOutputWriter<T>otherOutputWriter = context.getIoContext().buildWriter(otherOutputFile);
+
                       try {
-                          otherFileContext.getOrCreateOutputWriter().init();
+                          otherOutputWriter.init();
                       } catch (IOException ioe) {
                           throw new RuntimeException("Unable to create output writer: " + otherFileContext, ioe);
                       }
+
+                      otherOutputInfo = new OutputInfo<>(otherOutputFile, otherOutputWriter);
                   }
 
-                  appendToContext(otherFileContext, t);
+                  appendToContext(otherOutputInfo, t);
               }
         }
     }
 
-    private void appendToContext(FileContext fileContext, T t) {
+    private void appendToContext(OutputInfo<T> outputInfo, T t) {
         try {
-            fileContext.getOrCreateOutputWriter().process(t);
+            outputInfo.getOutputWriter().process(t);
         } catch (IOException ioe) {
-            throw new RuntimeException("Unable to append data to file context: " + fileContext, ioe);
+            throw new RuntimeException("Unable to append data to output: " + outputInfo, ioe);
         }
     }
 
     public Split prepareSplit() throws IOException {
-        if (otherFileContext == null) {
+        if (otherOutputInfo == null) {
             return null;
         }
 
-        final Split otherSplit = splitHelper.buildSplit(otherFileContext.getOutputFile(),
+        final Split otherSplit = splitHelper.buildSplit(otherOutputInfo.getOutputFile(),
                                                         context.getCurrentSplit(),
                                                         context.getConfig());
 

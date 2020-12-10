@@ -1,23 +1,19 @@
-package com.taulia.devtask1.transformer.context;
+package com.taulia.devtask1.transformer.consumer.io;
 
+import com.taulia.devtask1.transformer.context.FileContext;
 import com.taulia.devtask1.transformer.io.TransformerOutputWriter;
-import com.taulia.devtask1.transformer.io.helper.TransformerIOHelper;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.io.File;
-import java.io.IOException;
 
+@RequiredArgsConstructor
 @Getter
-@Setter
-public class OutputContext<T> {
-    private File outputFile;
-    private TransformerOutputWriter<T> outputWriter;
-
-    public TransformerOutputWriter<T> getOrCreateOutputWriter() throws IOException {
-        final TransformerIOHelper helper = new TransformerIOHelper();
-        return helper.buildWriter(buildOutputFile(fileContext), fileContext);
-    }
+@ToString
+public class OutputInfo<T> {
+    private final File outputFile;
+    private final TransformerOutputWriter<T> outputWriter;
 
     private File buildOutputFile(FileContext fileContext) {
         return null;

@@ -7,6 +7,7 @@ import com.taulia.devtask1.transformer.context.helper.GroupNameSelector;
 import com.taulia.devtask1.transformer.io.TransformerInputReader;
 import com.taulia.devtask1.transformer.io.TransformerOutputWriter;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,11 +15,11 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class InMemoryConsumer<T> implements TransformerConsumer<T> {
-    private final TransformerContext context;
-    private GroupNameSelector<T, String> groupNameSelector;
-    private Map<String, List<T>> groupNameToListMap;
+    private final TransformerContext<T> context;
+    private final GroupNameSelector<T, String> groupNameSelector;
+    private final Map<String, List<T>> groupNameToListMap;
 
-    public InMemoryConsumer(TransformerContext context) {
+    public InMemoryConsumer(TransformerContext<T> context) {
         this.context = context;
         this.groupNameSelector = context.getGroupNameSelector();
         this.groupNameToListMap = new HashMap<>();
@@ -55,7 +56,8 @@ public class InMemoryConsumer<T> implements TransformerConsumer<T> {
             final FileContext fileContext = context.nextGroupContext();
             TransformerOutputWriter<T> outputWriter = null;
             try {
-                outputWriter = fileContext.<T>getOrCreateOutputWriter();
+                final File outputFile = context.getFileNameProducer().apply(fileContext);
+                outputWriter = context.getIoContext().buildWriter(outputFile);
                 outputWriter.init();
 
                 final List<T> recordList = entry.getValue();

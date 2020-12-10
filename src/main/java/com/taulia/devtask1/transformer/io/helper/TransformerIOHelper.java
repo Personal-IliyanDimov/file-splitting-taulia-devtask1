@@ -21,9 +21,9 @@ public class TransformerIOHelper {
         return adapter;
     }
 
-    public <T,P> TransformerOutputWriter<T> buildWriter(File outputFile, OutputWriter.ImageContext imageContext, Function<T, P> converter) throws IOException {
-        final OutputWriter<?> outputWriter = ioHelper.buildWriter(outputFile);
-        final TransformerOutputWriterAdapter adapter = new TransformerOutputWriterAdapter<T,P>(outputWriter, converter, imageContext);
+    public <T,P> TransformerOutputWriter<T> buildWriter(File outputFile, OutputWriter.ImageContext imageContext, Function<T, Object> converter) throws IOException {
+        final OutputWriter<? extends Object> outputWriter = ioHelper.buildWriter(outputFile);
+        final TransformerOutputWriterAdapter adapter = new TransformerOutputWriterAdapter<T,? extends Object>(outputWriter, converter, imageContext);
         return adapter;
     }
 }

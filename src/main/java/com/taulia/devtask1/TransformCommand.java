@@ -59,13 +59,11 @@ public class TransformCommand<T> {
                                                      TransformerContext.OutputType outputType,
                                                      TransformerConfig config) {
 
-        final NamingContext namingContext = new NamingContext();
-        namingContext.setOutputGroupPrefix("buyer");
-        namingContext.setOutputGroupIndex(0L);
-        namingContext.setOutputOtherPrefix("other");
-        namingContext.setOutputOtherIndex(0L);
-        namingContext.setImagePrefix("image");
-        namingContext.setImageIndex(0L);
+        final NamingContext namingContext = new NamingContext("split", 0,
+                "buyer", 0,
+                "other", 0,
+                "image", 0
+        );
 
         final TransformerContext context = new TransformerContext();
         context.setCurrentSplit(prepareInitialSplit(inputFile, config));

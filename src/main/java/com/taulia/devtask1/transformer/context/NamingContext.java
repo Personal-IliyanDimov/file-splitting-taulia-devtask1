@@ -1,18 +1,18 @@
 package com.taulia.devtask1.transformer.context;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
+@AllArgsConstructor
 public class NamingContext {
-    private String outputSplitPrefix;
+    private final String outputSplitPrefix;
     private long outputSplitIndex;
-    private String outputGroupPrefix;
+    private final String outputGroupPrefix;
     private long outputGroupIndex;
-    private String outputOtherPrefix;
+    private final String outputOtherPrefix;
     private long outputOtherIndex;
-    private String imagePrefix;
+    private final String imagePrefix;
     private long imageIndex;
 
     public long getAndIncrementSplitIndex() {

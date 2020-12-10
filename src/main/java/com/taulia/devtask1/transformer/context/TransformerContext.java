@@ -19,8 +19,10 @@ public class TransformerContext<T> {
     private ArrayList<Split> splitList;
     private File outputFolder;
     private OutputType outputType;
+    private IOContext ioContext;
     private NamingContext namingContext;
     private TransformerConfig config;
+
 
     public FileContext nextSplitContext() {
         final FileContext fileContext = new FileContext();
@@ -81,7 +83,11 @@ public class TransformerContext<T> {
         };
     }
 
-    public Function<Object, T> getTransformFunction() {
+    public Function<Object, T> getWrapperFunction() {
+        return null;
+    }
+
+    public Function<T, Object> getUnwrapperFunction() {
         return null;
     }
 
@@ -90,6 +96,10 @@ public class TransformerContext<T> {
     }
 
     public SplitSourceSelector<T, String> getSplitSourceSelector() {
+        return null;
+    }
+
+    public Function<FileContext, File> getFileNameProducer() {
         return null;
     }
 
