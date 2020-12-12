@@ -1,8 +1,6 @@
 package com.taulia.devtask1.transformer.context;
 
 import com.taulia.devtask1.io.OutputWriter;
-import com.taulia.devtask1.transformer.context.helper.GroupNameSelector;
-import com.taulia.devtask1.transformer.context.helper.SplitSourceSelector;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 @Getter
 @Setter
@@ -82,26 +79,6 @@ public class TransformerContext<T> {
                 return nextImageFile();
             }
         };
-    }
-
-    public Function<Object, T> getWrapperFunction() {
-        return genericContext.getWrapperFunction();
-    }
-
-    public Function<T, Object> getUnwrapperFunction() {
-        return genericContext.getUnwrapperFunction();
-    }
-
-    public GroupNameSelector<T, String> getGroupNameSelector() {
-        return genericContext.getGroupNameSelector();
-    }
-
-    public SplitSourceSelector<T, String> getSplitSourceSelector() {
-        return genericContext.getSplitSourceSelector();
-    }
-
-    public Function<FileContext, File> getFileNameProducer() {
-        return genericContext.getFileNameProducer();
     }
 
     public static enum OutputType {

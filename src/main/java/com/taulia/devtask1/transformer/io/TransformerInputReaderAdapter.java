@@ -1,4 +1,4 @@
-package com.taulia.devtask1.transformer.io.helper;
+package com.taulia.devtask1.transformer.io;
 
 import com.taulia.devtask1.io.InputReader;
 import com.taulia.devtask1.transformer.io.TransformerInputReader;

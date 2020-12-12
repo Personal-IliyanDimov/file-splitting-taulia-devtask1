@@ -1,7 +1,6 @@
-package com.taulia.devtask1.transformer.io.helper;
+package com.taulia.devtask1.transformer.io;
 
 import com.taulia.devtask1.io.OutputWriter;
-import com.taulia.devtask1.transformer.io.TransformerOutputWriter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;

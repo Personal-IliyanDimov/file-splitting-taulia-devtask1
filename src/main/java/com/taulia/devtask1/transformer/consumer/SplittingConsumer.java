@@ -42,7 +42,7 @@ public class SplittingConsumer<T> implements TransformerConsumer<T> {
         final long splitFactor = splitDetails.getSplitFactor();
         final Function<Long, Function<String, Long>> factory = splitDetails.getSplitFunctionFactory();
 
-        this.splitSourceSelector = context.getSplitSourceSelector();
+        this.splitSourceSelector = context.getGenericContext().getSplitSourceSelector();
         this.splitFunction = factory.apply(splitFactor);
         this.childSplitIndexToOutputinfoMap = new HashMap<>();
     }
@@ -109,7 +109,7 @@ public class SplittingConsumer<T> implements TransformerConsumer<T> {
         else {
 
             final FileContext fileContext = context.nextSplitContext();
-            final File outputFile = context.getFileNameProducer().apply(fileContext);
+            final File outputFile = context.getGenericContext().getFileNameProducer().apply(fileContext);
             TransformerOutputWriter<T> outputWriter = null;
 
             try {

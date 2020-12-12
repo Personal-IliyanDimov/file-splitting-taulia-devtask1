@@ -31,7 +31,7 @@ public class DiskConsumer<T> implements TransformerConsumer<T> {
     public DiskConsumer(TransformerContext<T> context) {
         this.context = context;
         this.splitHelper = new SplitHelper(new StrategySelector());
-        this.groupNameSelector = context.getGroupNameSelector();
+        this.groupNameSelector = context.getGenericContext().getGroupNameSelector();
         this.groupToOutputInfoMap = new HashMap<>();
     }
 
@@ -115,7 +115,7 @@ public class DiskConsumer<T> implements TransformerConsumer<T> {
               if (groupToOutputInfoMap.keySet().size() < context.getConfig().getMaxOpenWriteHandlers()) {
                   final FileContext fileContext = context.nextGroupContext();
 
-                  final File outputFile = context.getFileNameProducer().apply(fileContext);
+                  final File outputFile = context.getGenericContext().getFileNameProducer().apply(fileContext);
                   TransformerOutputWriter<T> outputWriter = null;
 
                   try {
@@ -134,7 +134,7 @@ public class DiskConsumer<T> implements TransformerConsumer<T> {
 
                   if (otherOutputInfo == null) {
                       final FileContext otherFileContext = context.nextOtherContext();
-                      final File otherOutputFile = context.getFileNameProducer().apply(otherFileContext);
+                      final File otherOutputFile = context.getGenericContext().getFileNameProducer().apply(otherFileContext);
                       TransformerOutputWriter<T> otherOutputWriter = null;
 
                       try {

@@ -15,8 +15,8 @@ import com.taulia.devtask1.transformer.context.IOContext;
 import com.taulia.devtask1.transformer.context.TransformerContext;
 import com.taulia.devtask1.transformer.io.TransformerInputReader;
 import com.taulia.devtask1.transformer.io.TransformerOutputWriter;
-import com.taulia.devtask1.transformer.io.helper.TransformerInputReaderAdapter;
-import com.taulia.devtask1.transformer.io.helper.TransformerOutputWriterAdapter;
+import com.taulia.devtask1.transformer.io.TransformerInputReaderAdapter;
+import com.taulia.devtask1.transformer.io.TransformerOutputWriterAdapter;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class IOContextImpl<T> implements IOContext<T> {
     @Override
     public TransformerInputReader<T> buildReader(File inputFile) throws IOException {
         final InputReader<? extends Object> inputReader = helper.buildReader(context.getCurrentSplit().getInputFile());
-        final TransformerInputReaderAdapter<T> adapter = new TransformerInputReaderAdapter<>(inputReader, context.getWrapperFunction());
+        final TransformerInputReaderAdapter<T> adapter = new TransformerInputReaderAdapter<>(inputReader, context.getGenericContext().getWrapperFunction());
         return adapter;
     }
 
@@ -48,19 +48,19 @@ public class IOContextImpl<T> implements IOContext<T> {
         if (canonicalPath.endsWith(".csv")) {
             final OutputWriter<InvoiceRecord> delegateWriter = new CsvWriter(outputFile, new InvoiceRecordToCsvRowConverter());
             toWriter = new TransformerOutputWriterAdapter<T, InvoiceRecord>(delegateWriter,
-                                                                            context.getUnwrapperFunction().andThen(obj -> (InvoiceRecord) obj),
+                                                                            context.getGenericContext().getUnwrapperFunction().andThen(obj -> (InvoiceRecord) obj),
                                                                             context.prepareImageContext());
         }
         else if (canonicalPath.endsWith(".xml")) {
             final OutputWriter<InvoiceRecord> delegateWriter = new XmlWriter(outputFile, new InvoiceRecordToXmlElementConverter());
             toWriter = new TransformerOutputWriterAdapter<T, InvoiceRecord>(delegateWriter,
-                    context.getUnwrapperFunction().andThen(obj -> (InvoiceRecord) obj),
+                    context.getGenericContext().getUnwrapperFunction().andThen(obj -> (InvoiceRecord) obj),
                     context.prepareImageContext());
         }
         else if (canonicalPath.endsWith(".int-xml")) {
             final OutputWriter<ExtendedInvoiceRecord> delegateWriter = new ExtendedXmlWriter(outputFile, new ExtendedInvoiceRecordToXmlElementConverter());
             toWriter = new TransformerOutputWriterAdapter<T, ExtendedInvoiceRecord>(delegateWriter,
-                    context.getUnwrapperFunction().andThen(obj -> (ExtendedInvoiceRecord) obj),
+                    context.getGenericContext().getUnwrapperFunction().andThen(obj -> (ExtendedInvoiceRecord) obj),
                     context.prepareImageContext());
         }
         else {

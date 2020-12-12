@@ -21,7 +21,7 @@ public class InMemoryConsumer<T> implements TransformerConsumer<T> {
 
     public InMemoryConsumer(TransformerContext<T> context) {
         this.context = context;
-        this.groupNameSelector = context.getGroupNameSelector();
+        this.groupNameSelector = context.getGenericContext().getGroupNameSelector();
         this.groupNameToListMap = new HashMap<>();
     }
 
@@ -56,7 +56,7 @@ public class InMemoryConsumer<T> implements TransformerConsumer<T> {
             final FileContext fileContext = context.nextGroupContext();
             TransformerOutputWriter<T> outputWriter = null;
             try {
-                final File outputFile = context.getFileNameProducer().apply(fileContext);
+                final File outputFile = context.getGenericContext().getFileNameProducer().apply(fileContext);
                 outputWriter = context.getIoContext().buildWriter(outputFile);
                 outputWriter.init();
 

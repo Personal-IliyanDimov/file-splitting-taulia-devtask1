@@ -1,6 +1,7 @@
 package com.taulia.devtask1.command;
 
 
+import com.taulia.devtask1.config.Configuration;
 import com.taulia.devtask1.transformer.CompositeTransformer;
 import com.taulia.devtask1.transformer.DiskTransformer;
 import com.taulia.devtask1.transformer.InMemoryTransformer;
@@ -48,13 +49,13 @@ public abstract class TransformCommand<T> {
     }
 
     private void cleanUp(TransformerContext context) {
-        // clean up the whole output folder
+        // TO DO: clean up the whole output folder
     }
 
     private TransformerConfig prepareTransformerConfig() {
         TransformerConfig config = new TransformerConfig();
-        config.setMaxOpenWriteHandlers(100);
-        config.setMaxInMemoryFileSizeInBytes(100*1024*1024);
+        config.setMaxOpenWriteHandlers(Configuration.SAMPLE_MAX_OPEN_WRITE_HANDLERS);
+        config.setMaxInMemoryFileSizeInBytes(Configuration.SAMPLE_MAX_IN_MEMORY_FS_IN_BYTES);
         config.setTraversePolicy(new DeepFirstTraversePolicy());
         return config;
     }
@@ -64,10 +65,10 @@ public abstract class TransformCommand<T> {
                                                      TransformerContext.OutputType outputType,
                                                      TransformerConfig config) {
 
-        final NamingContext namingContext = new NamingContext("split", 0,
-                "buyer", 0,
-                "other", 0,
-                "image", 0
+        final NamingContext namingContext = new NamingContext(Configuration.SAMPLE_SPLIT_PREFIX, 0,
+                Configuration.SAMPLE_GROUP_PREFIX, 0,
+                Configuration.SAMPLE_OTHER_PREFIX, 0,
+                Configuration.SAMPLE_IMAGE_PREFIX, 0
         );
 
         final TransformerContext<T> context = new TransformerContext();
