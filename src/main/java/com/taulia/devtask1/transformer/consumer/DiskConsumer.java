@@ -9,6 +9,7 @@ import com.taulia.devtask1.transformer.context.helper.SplitHelper;
 import com.taulia.devtask1.transformer.io.TransformerInputReader;
 import com.taulia.devtask1.transformer.io.TransformerOutputWriter;
 import com.taulia.devtask1.transformer.strategy.Strategy;
+import com.taulia.devtask1.transformer.strategy.StrategySelector;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -29,7 +30,7 @@ public class DiskConsumer<T> implements TransformerConsumer<T> {
 
     public DiskConsumer(TransformerContext<T> context) {
         this.context = context;
-        this.splitHelper = new SplitHelper();
+        this.splitHelper = new SplitHelper(new StrategySelector());
         this.groupNameSelector = context.getGroupNameSelector();
         this.groupToOutputInfoMap = new HashMap<>();
     }
@@ -85,7 +86,7 @@ public class DiskConsumer<T> implements TransformerConsumer<T> {
         }
         else {
 
-              if (groupToOutputInfoMap.keySet().size() < context.getConfig().getMaxOpenHandlers()) {
+              if (groupToOutputInfoMap.keySet().size() < context.getConfig().getMaxOpenWriteHandlers()) {
                   final FileContext fileContext = context.nextGroupContext();
 
                   final File outputFile = context.getFileNameProducer().apply(fileContext);

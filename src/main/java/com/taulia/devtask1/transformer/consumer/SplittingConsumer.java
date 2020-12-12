@@ -8,6 +8,7 @@ import com.taulia.devtask1.transformer.context.helper.SplitHelper;
 import com.taulia.devtask1.transformer.context.helper.SplitSourceSelector;
 import com.taulia.devtask1.transformer.io.TransformerInputReader;
 import com.taulia.devtask1.transformer.io.TransformerOutputWriter;
+import com.taulia.devtask1.transformer.strategy.StrategySelector;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -31,7 +32,7 @@ public class SplittingConsumer<T> implements TransformerConsumer<T> {
 
     public SplittingConsumer(TransformerContext<T> context) {
         this.context = context;
-        this.helper = new SplitHelper();
+        this.helper = new SplitHelper(new StrategySelector());
         initialize(context);
     }
 

@@ -4,13 +4,15 @@ import com.taulia.devtask1.transformer.context.Split;
 import com.taulia.devtask1.transformer.context.TransformerConfig;
 import com.taulia.devtask1.transformer.strategy.Strategy;
 import com.taulia.devtask1.transformer.strategy.StrategySelector;
+import lombok.RequiredArgsConstructor;
 
 import java.io.File;
 import java.util.function.Function;
 
+@RequiredArgsConstructor
 public class SplitHelper {
 
-    private StrategySelector strategySelector;
+    private final StrategySelector strategySelector;
 
     public Split buildRootSplit(final File inputFile, final TransformerConfig config) {
         Split.SplitDetails splitDetails = null;
@@ -62,7 +64,7 @@ public class SplitHelper {
         final long fileLength = inputFile.length();
         final long maxInMemoryFileSizeInBytes = config.getMaxInMemoryFileSizeInBytes();
         final long targetedSplitFactor = Math.floorDiv(fileLength, maxInMemoryFileSizeInBytes) + 1;
-        final long realSplitFactor = Math.min(config.getMaxOpenHandlers() - 1, targetedSplitFactor);
+        final long realSplitFactor = Math.min(config.getMaxOpenWriteHandlers(), targetedSplitFactor);
         return realSplitFactor;
     }
 

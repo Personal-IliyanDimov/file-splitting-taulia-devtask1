@@ -12,6 +12,7 @@ import com.taulia.devtask1.transformer.context.Split;
 import com.taulia.devtask1.transformer.context.TransformerConfig;
 import com.taulia.devtask1.transformer.context.TransformerContext;
 import com.taulia.devtask1.transformer.context.helper.SplitHelper;
+import com.taulia.devtask1.transformer.strategy.StrategySelector;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public abstract class TransformCommand<T> {
     private CompositeTransformer<T> compositeTransformer;
 
     public TransformCommand() {
-        helper = new SplitHelper();
+        helper = new SplitHelper(new StrategySelector());
 
         final Transformer<T> splittingTransformer = new SplittingTransformer<T>();
         final Transformer<T> diskTransformer = new DiskTransformer<T>();
@@ -49,9 +50,9 @@ public abstract class TransformCommand<T> {
 
     private TransformerConfig prepareTransformerConfig() {
         TransformerConfig config = new TransformerConfig();
-        config.setMaxOpenHandlers(2);
+        config.setMaxOpenWriteHandlers(2);
         config.setMaxInMemoryFileSizeInBytes(512*1024);
-        config.setTraverPolicy(new DeepFirstTraversePolicy());
+        config.setTraversePolicy(new DeepFirstTraversePolicy());
         return config;
     }
 

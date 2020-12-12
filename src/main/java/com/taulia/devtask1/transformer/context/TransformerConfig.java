@@ -9,8 +9,8 @@ import java.util.List;
 @Setter
 public class TransformerConfig {
     private long maxInMemoryFileSizeInBytes;
-    private long maxOpenHandlers;
-    private TraversePolicy traverPolicy;
+    private long maxOpenWriteHandlers;
+    private TraversePolicy traversePolicy;
 
     public static interface TraversePolicy {
         public void addSplits(TransformerContext context, List<Split> splits);

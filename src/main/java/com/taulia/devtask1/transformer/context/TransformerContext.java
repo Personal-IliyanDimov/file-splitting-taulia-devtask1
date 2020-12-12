@@ -59,7 +59,7 @@ public class TransformerContext<T> {
     }
 
     public void addSplits(List<Split> splits) {
-        config.getTraverPolicy().addSplits(this, splits);
+        config.getTraversePolicy().addSplits(this, splits);
     }
 
     public void rotateCurrentSplit() throws IOException {
@@ -71,7 +71,7 @@ public class TransformerContext<T> {
         }
         this.splitList.remove(currentSplit);
 
-        final Split nextSplit = config.getTraverPolicy().nextSplit(this);
+        final Split nextSplit = config.getTraversePolicy().nextSplit(this);
         this.currentSplit = nextSplit;
     }
 
