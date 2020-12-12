@@ -52,6 +52,7 @@ public class SplittingConsumer<T> implements TransformerConsumer<T> {
         Consumer<T> recordsConsumer = getRecordsConsumer();
         try {
             inputReader.process(recordsConsumer);
+            endStreams();
         }
         finally {
             closeStreams();
@@ -61,12 +62,28 @@ public class SplittingConsumer<T> implements TransformerConsumer<T> {
         return splitArray != null ? splitArray : new Split[0];
     }
 
+    private void endStreams() throws IOException {
+        final List<Exception> list = new LinkedList<>();
+
+        for (OutputInfo<T> outputInfo : childSplitIndexToOutputinfoMap.values()) {
+            try {
+                outputInfo.getOutputWriter().end();
+            } catch (Exception exc) {
+                log.error("Unable to end file. ", exc);
+                list.add(exc);
+            }
+        }
+
+        if (! list.isEmpty()) {
+            throw new IOException("Multiple io exceptions occurred during clean up: " + list.toString());
+        }
+    }
+
     private void closeStreams() throws IOException {
         final List<Exception> list = new LinkedList<>();
 
-        for (Map.Entry<Long, OutputInfo<T>> entry : childSplitIndexToOutputinfoMap.entrySet()) {
+        for (OutputInfo<T> outputInfo : childSplitIndexToOutputinfoMap.values()) {
             try {
-                final OutputInfo<T> outputInfo = entry.getValue();
                 outputInfo.getOutputWriter().close();
             } catch (Exception exc) {
                 log.error("Unable to close file. ", exc);

@@ -44,8 +44,12 @@ public class CommandRunner {
 			return ;
 		}
 
+		final long startTimeInMillis = System.currentTimeMillis();
+
 		final TransformCommand command = new InvoiceTransformerCommand();
 		command.executeCommand(inputFile, outputFolder, outputType);
+
+		System.out.println("Execution takes(ms): " + (System.currentTimeMillis() - startTimeInMillis));
 	}
 
 	protected static class InvoiceTransformerCommand extends TransformCommand<TransformedItem<?>> {

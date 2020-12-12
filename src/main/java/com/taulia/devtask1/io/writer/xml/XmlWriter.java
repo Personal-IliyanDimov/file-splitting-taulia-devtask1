@@ -30,6 +30,6 @@ public class XmlWriter extends AbstractXmlWriter<InvoiceRecord> {
             input.setInvoiceImage(null);
         }
 
-        getWriter().write(converter.convert(input, imageFile.toString()) + System.lineSeparator());
+        getWriter().write(converter.convert(input, imageFile != null ? imageFile.toString() : "") + System.lineSeparator());
     }
 }

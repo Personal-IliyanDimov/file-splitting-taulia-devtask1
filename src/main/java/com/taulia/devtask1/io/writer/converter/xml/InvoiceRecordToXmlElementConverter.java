@@ -2,6 +2,7 @@ package com.taulia.devtask1.io.writer.converter.xml;
 
 import com.taulia.devtask1.io.model.InvoiceRecord;
 import com.taulia.devtask1.io.shared.xml.XmlNodeNames;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class InvoiceRecordToXmlElementConverter {
 
@@ -16,7 +17,7 @@ public class InvoiceRecordToXmlElementConverter {
           .append(buildElement(XmlNodeNames.ELEMENT_INVOICE_CURRENCY, record.getInvoiceCurrency()))
           .append(buildElement(XmlNodeNames.ELEMENT_INVOICE_STATUS, record.getInvoiceStatus()))
           .append(buildElement(XmlNodeNames.ELEMENT_SUPPLIER, record.getSupplier()))
-          .append(buildElement(XmlNodeNames.ELEMENT_INVOICE_IMAGE_LOCATION, externalInvoiceImageLocation))
+          .append(buildElement(XmlNodeNames.ELEMENT_INVOICE_IMAGE_LOCATION, StringEscapeUtils.escapeXml11(externalInvoiceImageLocation)))
           .append(buildEndTag(XmlNodeNames.ELEMENT_ROW));
 
         return sb.toString();

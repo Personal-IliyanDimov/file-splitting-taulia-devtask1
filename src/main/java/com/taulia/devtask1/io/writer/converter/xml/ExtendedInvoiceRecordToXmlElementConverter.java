@@ -3,6 +3,7 @@ package com.taulia.devtask1.io.writer.converter.xml;
 import com.taulia.devtask1.io.model.ExtendedInvoiceRecord;
 import com.taulia.devtask1.io.model.InvoiceRecord;
 import com.taulia.devtask1.io.shared.xml.XmlNodeNames;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class ExtendedInvoiceRecordToXmlElementConverter {
 
@@ -20,7 +21,7 @@ public class ExtendedInvoiceRecordToXmlElementConverter {
           .append(buildElement(XmlNodeNames.ELEMENT_INVOICE_STATUS, record.getInvoiceStatus()))
           .append(buildElement(XmlNodeNames.ELEMENT_SUPPLIER, record.getSupplier()))
 
-          .append(buildElement(XmlNodeNames.ELEMENT_INVOICE_IMAGE_LOCATION, extendedInvoiceRecord.getInvoiceImageLocation()))
+          .append(buildElement(XmlNodeNames.ELEMENT_INVOICE_IMAGE_LOCATION, StringEscapeUtils.escapeXml11(extendedInvoiceRecord.getInvoiceImageLocation())))
           .append(buildEndTag(XmlNodeNames.ELEMENT_ROW));
 
         return sb.toString();

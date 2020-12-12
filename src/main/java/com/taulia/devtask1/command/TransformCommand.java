@@ -13,11 +13,13 @@ import com.taulia.devtask1.transformer.context.TransformerConfig;
 import com.taulia.devtask1.transformer.context.TransformerContext;
 import com.taulia.devtask1.transformer.context.helper.SplitHelper;
 import com.taulia.devtask1.transformer.strategy.StrategySelector;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public abstract class TransformCommand<T> {
 
     private SplitHelper helper;
@@ -40,6 +42,7 @@ public abstract class TransformCommand<T> {
             compositeTransformer.transform(context);
         }
         catch (Exception exc) {
+            log.error("Unable to execute transformation. ",exc);
             cleanUp(context);
         }
     }
@@ -50,8 +53,8 @@ public abstract class TransformCommand<T> {
 
     private TransformerConfig prepareTransformerConfig() {
         TransformerConfig config = new TransformerConfig();
-        config.setMaxOpenWriteHandlers(2);
-        config.setMaxInMemoryFileSizeInBytes(512*1024);
+        config.setMaxOpenWriteHandlers(100);
+        config.setMaxInMemoryFileSizeInBytes(100*1024*1024);
         config.setTraversePolicy(new DeepFirstTraversePolicy());
         return config;
     }
